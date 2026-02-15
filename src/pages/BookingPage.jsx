@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientLookup from '../components/booking/PatientLookup';
 import PatientRegistration from '../components/booking/PatientRegistration';
@@ -17,55 +17,86 @@ const STEPS = {
 
 const BookingPage = () => {
     const navigate = useNavigate();
-    const [currentStep, setCurrentStep] = useState(STEPS.PATIENT_LOOKUP);
-    const [bookingData, setBookingData] = useState({
-        patient: null,
-        patientExists: false,
-        appointmentType: null,
-        selectedSlot: null,
-        selectedDate: null,
-        bookingReference: null,
-    });
 
-    const updateBookingData = (newData) => {
-        setBookingData((prev) => ({ ...prev, ...newData }));
+    // Initialize state from localStorage or defaults
+    const getInitialState = () => {
+        const saved = localStorage.getItem('bookingState');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return {
+                    currentStep: STEPS.PATIENT_LOOKUP,
+                    patient: null,
+                    patientExists: false,
+                    appointmentType: null,
+                    selectedSlot: null,
+                    selectedDate: null,
+                    bookingReference: null,
+                };
+            }
+        }
+        return {
+            currentStep: STEPS.PATIENT_LOOKUP,
+            patient: null,
+            patientExists: false,
+            appointmentType: null,
+            selectedSlot: null,
+            selectedDate: null,
+            bookingReference: null,
+        };
+    };
+
+    const [state, setState] = useState(getInitialState);
+
+    // Save state to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('bookingState', JSON.stringify(state));
+    }, [state]);
+
+    const updateState = (newData) => {
+        setState((prev) => ({ ...prev, ...newData }));
     };
 
     const handlePatientLookupComplete = (patient, exists) => {
-        updateBookingData({ patient, patientExists: exists });
-        if (exists) {
-            setCurrentStep(STEPS.APPOINTMENT_TYPE);
-        } else {
-            setCurrentStep(STEPS.PATIENT_REGISTRATION);
-        }
+        updateState({
+            patient,
+            patientExists: exists,
+            currentStep: exists ? STEPS.APPOINTMENT_TYPE : STEPS.PATIENT_REGISTRATION
+        });
     };
 
     const handleRegistrationComplete = (patient) => {
-        updateBookingData({ patient, patientExists: true });
-        setCurrentStep(STEPS.APPOINTMENT_TYPE);
+        updateState({
+            patient,
+            patientExists: true,
+            currentStep: STEPS.APPOINTMENT_TYPE
+        });
     };
 
     const handleAppointmentTypeSelected = (appointmentType) => {
-        updateBookingData({ appointmentType });
-        setCurrentStep(STEPS.SLOT_SELECTION);
+        updateState({
+            appointmentType,
+            currentStep: STEPS.SLOT_SELECTION
+        });
     };
 
     const handleSlotSelected = (slot, date) => {
-        updateBookingData({ selectedSlot: slot, selectedDate: date });
-        setCurrentStep(STEPS.CONFIRMATION);
+        updateState({
+            selectedSlot: slot,
+            selectedDate: date,
+            currentStep: STEPS.CONFIRMATION
+        });
     };
 
     const handleBookingComplete = (bookingReference) => {
-        updateBookingData({ bookingReference });
-    };
-
-    const handleBackToHome = () => {
-        navigate('/');
+        updateState({ bookingReference });
     };
 
     const handleStartOver = () => {
-        setCurrentStep(STEPS.PATIENT_LOOKUP);
-        setBookingData({
+        localStorage.removeItem('bookingState');
+        setState({
+            currentStep: STEPS.PATIENT_LOOKUP,
             patient: null,
             patientExists: false,
             appointmentType: null,
@@ -75,8 +106,13 @@ const BookingPage = () => {
         });
     };
 
+    const handleBackToHome = () => {
+        localStorage.removeItem('bookingState');
+        navigate('/');
+    };
+
     const renderStep = () => {
-        switch (currentStep) {
+        switch (state.currentStep) {
             case STEPS.PATIENT_LOOKUP:
                 return (
                     <PatientLookup
@@ -87,32 +123,32 @@ const BookingPage = () => {
             case STEPS.PATIENT_REGISTRATION:
                 return (
                     <PatientRegistration
-                        medicareData={bookingData.patient}
+                        medicareData={state.patient}
                         onComplete={handleRegistrationComplete}
-                        onBack={() => setCurrentStep(STEPS.PATIENT_LOOKUP)}
+                        onBack={() => updateState({ currentStep: STEPS.PATIENT_LOOKUP })}
                     />
                 );
             case STEPS.APPOINTMENT_TYPE:
                 return (
                     <AppointmentTypeSelection
                         onSelect={handleAppointmentTypeSelected}
-                        onBack={() => setCurrentStep(STEPS.PATIENT_LOOKUP)}
+                        onBack={() => updateState({ currentStep: STEPS.PATIENT_LOOKUP })}
                     />
                 );
             case STEPS.SLOT_SELECTION:
                 return (
                     <SlotSelection
-                        appointmentType={bookingData.appointmentType}
+                        appointmentType={state.appointmentType}
                         onSelect={handleSlotSelected}
-                        onBack={() => setCurrentStep(STEPS.APPOINTMENT_TYPE)}
+                        onBack={() => updateState({ currentStep: STEPS.APPOINTMENT_TYPE })}
                     />
                 );
             case STEPS.CONFIRMATION:
                 return (
                     <BookingConfirmation
-                        bookingData={bookingData}
+                        bookingData={state}
                         onComplete={handleBookingComplete}
-                        onBack={() => setCurrentStep(STEPS.SLOT_SELECTION)}
+                        onBack={() => updateState({ currentStep: STEPS.SLOT_SELECTION })}
                         onStartOver={handleStartOver}
                     />
                 );
@@ -134,8 +170,7 @@ const BookingPage = () => {
                 {steps.map((step) => (
                     <div
                         key={step.number}
-                        className={`step ${currentStep >= step.number ? 'active' : ''} ${currentStep > step.number ? 'completed' : ''
-                            }`}
+                        className={`step ${state.currentStep >= step.number ? 'active' : ''} ${state.currentStep > step.number ? 'completed' : ''}`}
                     >
                         <div className="step-number">{step.number}</div>
                         <div className="step-label">{step.label}</div>
@@ -158,8 +193,8 @@ const BookingPage = () => {
 
             <div className="booking-container">
                 <div className="container">
-                    {currentStep !== STEPS.PATIENT_LOOKUP &&
-                        currentStep !== STEPS.PATIENT_REGISTRATION &&
+                    {state.currentStep !== STEPS.PATIENT_LOOKUP &&
+                        state.currentStep !== STEPS.PATIENT_REGISTRATION &&
                         getStepIndicator()}
                     <div className="booking-content">{renderStep()}</div>
                 </div>

@@ -28,6 +28,7 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                 appointment_type: bookingData.appointmentType.id,
                 date: bookingData.selectedDate,
                 start_time: bookingData.selectedSlot.start_time,
+                end_time: bookingData.selectedSlot.end_time,
                 cancellation_policy_accepted: true,
                 referral_file: referralFile,
                 reports_file: reportsFile,
