@@ -16,7 +16,7 @@ const AppointmentTypeSelection = ({ onSelect, onBack }) => {
             const response = await appointmentTypeAPI.list();
             console.log(response);
             
-            setTypes(response.data.filter(type => type.is_active));
+            setTypes(response.data.results);
         } catch (err) {
             setError('Failed to load appointment types.');
             console.error(err);
