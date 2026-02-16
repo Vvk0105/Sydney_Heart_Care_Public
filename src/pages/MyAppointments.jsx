@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { appointmentAPI } from '../services/api';
 import './MyAppointments.css';
 
 const MyAppointments = () => {
@@ -29,7 +29,7 @@ const MyAppointments = () => {
         setError('');
 
         try {
-            const response = await api.post('/appointments/my_appointments/', formData);
+            const response = await appointmentAPI.myAppointments(formData);
             setPatientData({ name: response.data.patient_name });
             setAppointments(response.data.appointments);
         } catch (err) {
@@ -47,9 +47,7 @@ const MyAppointments = () => {
         }
 
         try {
-            await api.post(`/appointments/${appointmentId}/cancel/`, {
-                reason: 'Cancelled by patient',
-            });
+            await appointmentAPI.cancel(appointmentId, 'Cancelled by patient');
             alert('Appointment cancelled successfully');
             // Refresh the list
             handleSubmit(new Event('submit'));

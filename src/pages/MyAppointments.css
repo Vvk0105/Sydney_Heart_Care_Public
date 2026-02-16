@@ -1,10 +1,10 @@
 .my-appointments-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #fef5f5 0%, #ffffff 100%);
+    background: linear-gradient(135deg, #e8f4f8 0%, #ffffff 100%);
 }
 
 .appointments-header {
-    background: #d94745;
+    background: #486287;
     color: white;
     padding: 60px 20px;
     text-align: center;
@@ -36,7 +36,7 @@
 }
 
 .lookup-form-card h2 {
-    color: #d94745;
+    color: #486287;
     margin-bottom: 10px;
 }
 
@@ -67,7 +67,7 @@
 
 .form-group input:focus {
     outline: none;
-    border-color: #d94745;
+    border-color: #486287;
 }
 
 .error-message {
@@ -94,7 +94,7 @@
 }
 
 .list-header h2 {
-    color: #d94745;
+    color: #486287;
     margin-bottom: 5px;
 }
 
@@ -220,15 +220,15 @@
 }
 
 .btn-primary {
-    background: #d94745;
+    background: #486287;
     color: white;
     width: 100%;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: #c23836;
+    background: #3a4f6b;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(217, 71, 69, 0.3);
+    box-shadow: 0 4px 12px rgba(72, 98, 135, 0.3);
 }
 
 .btn-primary:disabled {

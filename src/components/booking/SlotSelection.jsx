@@ -2,17 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { appointmentAPI } from '../../services/api';
 
 const SlotSelection = ({ appointmentType, onSelect, onBack }) => {
-    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [slots, setSlots] = useState([]);
     const [selectedSlot, setSelectedSlot] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const getMinDate = () => {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        return tomorrow.toISOString().split('T')[0];
-    };
+    // Allow booking from today onwards
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const minDate = today.toISOString().split('T')[0];
+
+    // Max 3 months in advance
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 3);
+    const maxDateStr = maxDate.toISOString().split('T')[0];
 
     const fetchSlots = async (date) => {
         setLoading(true);
@@ -64,9 +68,10 @@ const SlotSelection = ({ appointmentType, onSelect, onBack }) => {
                         <label className="required">Select Date</label>
                         <input
                             type="date"
-                            value={selectedDate}
+                            value={selectedDate || ''}
                             onChange={handleDateChange}
-                            min={getMinDate()}
+                            min={minDate}
+                            max={maxDateStr}
                             required
                         />
                     </div>
@@ -84,25 +89,21 @@ const SlotSelection = ({ appointmentType, onSelect, onBack }) => {
                 {!loading && selectedDate && slots.length === 0 && (
                     <div className="no-slots-message">
                         <p>No available slots for the selected date.</p>
-                        <p>Please choose a different date.</p>
+                        <p className="hint">Try selecting a different date.</p>
                     </div>
                 )}
 
                 {!loading && slots.length > 0 && (
-                    <div>
-                        <h3 style={{ marginBottom: '20px', color: 'var(--brand-navy)' }}>
-                            Available Times
-                        </h3>
-                        <div className="slots-grid">
+                    <div className="time-slots-container">
+                        <h3>Available Times</h3>
+                        <div className="time-slots">
                             {slots.map((slot, index) => (
                                 <button
                                     key={index}
-                                    type="button"
-                                    className={`slot-button ${selectedSlot?.start_time === slot.start_time ? 'selected' : ''
-                                        }`}
+                                    className={`time-slot ${selectedSlot === slot ? 'selected' : ''}`}
                                     onClick={() => handleSlotSelect(slot)}
                                 >
-                                    {slot.start_time.slice(0, 5)}
+                                    {slot.start_time.substring(0, 5)}
                                 </button>
                             ))}
                         </div>
@@ -110,15 +111,14 @@ const SlotSelection = ({ appointmentType, onSelect, onBack }) => {
                 )}
             </div>
 
-            <div className="action-buttons">
-                <button type="button" className="btn btn-secondary" onClick={onBack}>
+            <div className="actions">
+                <button className="btn-secondary" onClick={onBack}>
                     Back
                 </button>
                 <button
-                    type="button"
-                    className="btn btn-primary"
+                    className="btn-primary"
                     onClick={handleContinue}
-                    disabled={!selectedSlot || !selectedDate}
+                    disabled={!selectedSlot}
                 >
                     Continue
                 </button>
