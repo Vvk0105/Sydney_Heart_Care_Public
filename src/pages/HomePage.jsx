@@ -54,7 +54,7 @@ const HomePage = () => {
                         <span>📍 Unit 18, 35 Old Northern Rd, Baulkham Hills</span>
                     </div>
                     <div className="top-bar-right">
-                        <span>⏰ Mon-Fri: 9am - 4pm</span>
+                        <span>⏰ Mon-Sat: 9am - 4pm</span>
                         <span className="highlight-contact">📞 02 9639 2929</span>
                     </div>
                 </div>
@@ -214,7 +214,7 @@ const HomePage = () => {
                                 <div className="c-icon">🕒</div>
                                 <div className="c-details">
                                     <strong>Hours</strong>
-                                    <span>Monday - Friday: 9:00 AM - 4:00 PM</span>
+                                    <span>Monday - Saturday: 9:00 AM - 4:00 PM</span>
                                 </div>
                             </li>
                         </ul>
@@ -256,7 +256,7 @@ const HomePage = () => {
                             <ul>
                                 <li><a href="tel:0296392929">02 9639 2929</a></li>
                                 <li>Baulkham Hills, NSW</li>
-                                <li>Mon-Fri: 9am - 4pm</li>
+                                <li>Mon-Sat: 9am - 4pm</li>
                             </ul>
                         </div>
                     </div>
