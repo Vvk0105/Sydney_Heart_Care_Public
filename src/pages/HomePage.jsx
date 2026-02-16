@@ -84,6 +84,7 @@ const HomePage = () => {
                             <li><a href="#about" className="nav-link" onClick={(e) => scrollToSection(e, '#about')}>About</a></li>
                             <li><a href="#services" className="nav-link" onClick={(e) => scrollToSection(e, '#services')}>Services</a></li>
                             <li><a href="#contact" className="nav-link" onClick={(e) => scrollToSection(e, '#contact')}>Contact</a></li>
+                            <li><Link to="/my-appointments" className="nav-link">My Appointments</Link></li>
                         </ul>
                         <Link to="/book" className="btn btn-primary nav-btn">Book Appointment</Link>
                     </nav>
@@ -245,6 +246,7 @@ const HomePage = () => {
                                 <li><a href="#about" onClick={(e) => scrollToSection(e, '#about')}>About Us</a></li>
                                 <li><a href="#services" onClick={(e) => scrollToSection(e, '#services')}>Services</a></li>
                                 <li><Link to="/book">Book Appointment</Link></li>
+                                <li><Link to="/my-appointments">My Appointments</Link></li>
                                 <li><a href="#contact" onClick={(e) => scrollToSection(e, '#contact')}>Contact</a></li>
                             </ul>
                         </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import BookingPage from './pages/BookingPage';
+import MyAppointments from './pages/MyAppointments';
 import './App.css';
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/book" element={<BookingPage />} />
+                <Route path="/my-appointments" element={<MyAppointments />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Router>
