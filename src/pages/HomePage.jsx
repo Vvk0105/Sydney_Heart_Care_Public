@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const HomePage = () => {
+const HomePage = (currentPage = '') => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     useEffect(() => {
@@ -80,10 +80,15 @@ const HomePage = () => {
 
                     <nav className={`main-nav ${mobileMenuOpen ? 'nav-open' : ''}`}>
                         <ul className="nav-list">
-                            <li><a href="#home" className="nav-link active" onClick={(e) => scrollToSection(e, '#home')}>Home</a></li>
+                            {/* <li><a href="#home" className="nav-link active" onClick={(e) => scrollToSection(e, '#home')}>Home</a></li>
                             <li><a href="#about" className="nav-link" onClick={(e) => scrollToSection(e, '#about')}>About</a></li>
                             <li><a href="#services" className="nav-link" onClick={(e) => scrollToSection(e, '#services')}>Services</a></li>
                             <li><a href="#contact" className="nav-link" onClick={(e) => scrollToSection(e, '#contact')}>Contact</a></li>
+                            <li><Link to="/my-appointments" className="nav-link">My Appointments</Link></li> */}
+                            <li><Link to="/" className={`nav-link ${currentPage === 'home' ? 'active' : ''}`}>Home</Link></li>
+                            <li><Link to="/about" className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}>About</Link></li>
+                            <li><Link to="/services" className={`nav-link ${currentPage === 'services' ? 'active' : ''}`}>Services</Link></li>
+                            <li><Link to="/contact" className={`nav-link ${currentPage === 'contact' ? 'active' : ''}`}>Contact</Link></li>
                             <li><Link to="/my-appointments" className="nav-link">My Appointments</Link></li>
                         </ul>
                         <Link to="/book" className="btn btn-primary nav-btn">Book Appointment</Link>
