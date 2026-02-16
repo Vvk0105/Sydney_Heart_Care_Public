@@ -25,6 +25,14 @@ const PatientLookup = ({ onComplete, onCancel }) => {
             const response = await patientAPI.lookup(formData);
 
             if (response.data.exists) {
+                if (response.data.has_unpaid_penalty) {
+                    setError(
+                        'You have an unpaid cancellation penalty. Please contact the clinic at (02) 9999 9999 to make payment before booking another appointment.'
+                    );
+                    setLoading(false);
+                    return;
+                }
+
                 onComplete(response.data, true);
             } else {
                 onComplete(formData, false);
