@@ -49,6 +49,28 @@ const AboutPage = () => {
                                         <span className="tag">FRCPUK</span>
                                     </div>
                                 </div>
+
+                                {/* Areas of Specialization */}
+                                <div style={{ marginTop: '25px' }}>
+                                    <h4 style={{ color: 'var(--brand-navy)', marginBottom: '15px' }}>Areas of Specialization</h4>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                        <span className="tag">Cardiac Failure</span>
+                                        <span className="tag">Arrhythmia</span>
+                                        <span className="tag">Coronary Artery Disease</span>
+                                        <span className="tag">Valvular Heart Disease</span>
+                                    </div>
+                                </div>
+
+                                {/* Languages */}
+                                <div style={{ marginTop: '25px' }}>
+                                    <h4 style={{ color: 'var(--brand-navy)', marginBottom: '15px' }}>Languages Spoken</h4>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                        <span className="tag">English</span>
+                                        <span className="tag">Hindi</span>
+                                        <span className="tag">Punjabi</span>
+                                        <span className="tag">Urdu</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import Header from './Header';
+import { Link } from 'react-router-dom';
 
 const PageLayout = ({ children, currentPage = '' }) => {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
     useEffect(() => {
         // Intersection Observer for scroll animations
         const animatedElements = document.querySelectorAll('.fade-in');
@@ -27,57 +26,9 @@ const PageLayout = ({ children, currentPage = '' }) => {
         return () => observer.disconnect();
     }, []);
 
-    const toggleMobileMenu = () => {
-        setMobileMenuOpen(!mobileMenuOpen);
-    };
-
     return (
         <div>
-            {/* Top Bar */}
-            <div className="top-bar">
-                <div className="container top-bar-inner">
-                    <div className="top-bar-left">
-                        <span>📍 Unit 18, 35 Old Northern Rd, Baulkham Hills</span>
-                    </div>
-                    <div className="top-bar-right">
-                        <span>⏰ Mon-Sat: 9am - 4pm</span>
-                        <span className="highlight-contact">📞 02 9639 2929</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Header */}
-            <header className="header" id="header">
-                <div className="container nav-container">
-                    <div className="brand">
-                        <Link to="/" style={{ textDecoration: 'none' }}>
-                            <h1 className="logo-text">Sydney Heart Care</h1>
-                        </Link>
-                    </div>
-
-                    <button
-                        className="mobile-toggle"
-                        id="mobile-toggle"
-                        aria-label="Toggle Menu"
-                        onClick={toggleMobileMenu}
-                    >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-
-                    <nav className={`main-nav ${mobileMenuOpen ? 'nav-open' : ''}`}>
-                        <ul className="nav-list">
-                            <li><Link to="/" className={`nav-link ${currentPage === 'home' ? 'active' : ''}`}>Home</Link></li>
-                            <li><Link to="/about" className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}>About</Link></li>
-                            <li><Link to="/services" className={`nav-link ${currentPage === 'services' ? 'active' : ''}`}>Services</Link></li>
-                            <li><Link to="/contact" className={`nav-link ${currentPage === 'contact' ? 'active' : ''}`}>Contact</Link></li>
-                            <li><Link to="/my-appointments" className="nav-link">My Appointments</Link></li>
-                        </ul>
-                        <Link to="/book" className="btn btn-primary nav-btn">Book Appointment</Link>
-                    </nav>
-                </div>
-            </header>
+            <Header currentPage={currentPage} />
 
             {/* Page Content */}
             {children}

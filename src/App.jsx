@@ -17,6 +17,12 @@ import ContactPage from './pages/ContactPage';
 import FAQPage from './pages/FAQPage';
 import FeesPage from './pages/FeesPage';
 import PrivacyPage from './pages/PrivacyPage';
+import ReferPatientPage from './pages/doctors/ReferPatientPage';
+import DoctorsContactPage from './pages/doctors/DoctorsContactPage';
+import TestimonialsPage from './pages/TestimonialsPage';
+import EducationalContentPage from './pages/EducationalContentPage';
+import UploadReportsPage from './pages/UploadReportsPage';
+import UploadReferralPage from './pages/UploadReferralPage';
 import './App.css';
 
 function App() {
@@ -45,10 +51,23 @@ function App() {
                 <Route path="/fees" element={<FeesPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
 
+                {/* For Doctors */}
+                <Route path="/doctors/refer-patient" element={<ReferPatientPage />} />
+                <Route path="/doctors/contact" element={<DoctorsContactPage />} />
+
+                {/* Education & Testimonials */}
+                <Route path="/testimonials" element={<TestimonialsPage />} />
+                <Route path="/educational-content" element={<EducationalContentPage />} />
+
+                {/* Upload Pages */}
+                <Route path="/upload-reports" element={<UploadReportsPage />} />
+                <Route path="/upload-referral" element={<UploadReferralPage />} />
+
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Router>
     );
 }
+
 
 export default App;
