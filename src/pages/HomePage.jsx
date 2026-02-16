@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import Header from '../components/Header';
 import { Link } from 'react-router-dom';
 
-const HomePage = (currentPage = '') => {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+const HomePage = () => {
     useEffect(() => {
-        // Intersection Observer for scroll animations
         const animatedElements = document.querySelectorAll('.fade-in');
         const observer = new IntersectionObserver(
             (entries) => {
@@ -26,75 +24,9 @@ const HomePage = (currentPage = '') => {
         return () => observer.disconnect();
     }, []);
 
-    const toggleMobileMenu = () => {
-        setMobileMenuOpen(!mobileMenuOpen);
-    };
-
-    const scrollToSection = (e, sectionId) => {
-        e.preventDefault();
-        const target = document.querySelector(sectionId);
-        if (target) {
-            const headerOffset = 80;
-            const elementPosition = target.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth',
-            });
-        }
-        setMobileMenuOpen(false);
-    };
-
     return (
         <div>
-            {/* Top Bar */}
-            <div className="top-bar">
-                <div className="container top-bar-inner">
-                    <div className="top-bar-left">
-                        <span>📍 Unit 18, 35 Old Northern Rd, Baulkham Hills</span>
-                    </div>
-                    <div className="top-bar-right">
-                        <span>⏰ Mon-Sat: 9am - 4pm</span>
-                        <span className="highlight-contact">📞 02 9639 2929</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Header */}
-            <header className="header" id="header">
-                <div className="container nav-container">
-                    <div className="brand">
-                        <h1 className="logo-text">Sydney Heart Care</h1>
-                    </div>
-
-                    <button
-                        className="mobile-toggle"
-                        id="mobile-toggle"
-                        aria-label="Toggle Menu"
-                        onClick={toggleMobileMenu}
-                    >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-
-                    <nav className={`main-nav ${mobileMenuOpen ? 'nav-open' : ''}`}>
-                        <ul className="nav-list">
-                            {/* <li><a href="#home" className="nav-link active" onClick={(e) => scrollToSection(e, '#home')}>Home</a></li>
-                            <li><a href="#about" className="nav-link" onClick={(e) => scrollToSection(e, '#about')}>About</a></li>
-                            <li><a href="#services" className="nav-link" onClick={(e) => scrollToSection(e, '#services')}>Services</a></li>
-                            <li><a href="#contact" className="nav-link" onClick={(e) => scrollToSection(e, '#contact')}>Contact</a></li>
-                            <li><Link to="/my-appointments" className="nav-link">My Appointments</Link></li> */}
-                            <li><Link to="/" className={`nav-link ${currentPage === 'home' ? 'active' : ''}`}>Home</Link></li>
-                            <li><Link to="/about" className={`nav-link ${currentPage === 'about' ? 'active' : ''}`}>About</Link></li>
-                            <li><Link to="/services" className={`nav-link ${currentPage === 'services' ? 'active' : ''}`}>Services</Link></li>
-                            <li><Link to="/contact" className={`nav-link ${currentPage === 'contact' ? 'active' : ''}`}>Contact</Link></li>
-                            <li><Link to="/my-appointments" className="nav-link">My Appointments</Link></li>
-                        </ul>
-                        <Link to="/book" className="btn btn-primary nav-btn">Book Appointment</Link>
-                    </nav>
-                </div>
-            </header>
+            <Header currentPage="home" />
 
             {/* Hero Section */}
             <section className="hero" id="home">
