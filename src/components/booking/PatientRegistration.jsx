@@ -12,8 +12,26 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
         suburb: '',
         state: 'NSW',
         postcode: '',
+        occupation: '',
+        next_of_kin_name: '',
+        next_of_kin_relationship: '',
+        next_of_kin_phone: '',
         gp_name: '',
         gp_phone: '',
+        gp_suburb: '',
+        gp_state: 'NSW',
+        gp_postcode: '',
+        other_specialist_name: '',
+        other_specialist_phone: '',
+        other_specialist_address: '',
+        health_fund_name: '',
+        health_fund_membership: '',
+        pension_number: '',
+        veterans_affairs_number: '',
+        veterans_affairs_card_type: '',
+        workers_comp_claim: false,
+        workers_comp_details: '',
+        legal_process: false,
         consent_given: false,
         cancellation_policy_accepted: false,
     });
@@ -121,6 +139,56 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                     </div>
                 </div>
 
+                <div className="form-group">
+                    <label>Occupation</label>
+                    <input
+                        type="text"
+                        name="occupation"
+                        value={formData.occupation}
+                        onChange={handleChange}
+                        placeholder="e.g. Teacher, Engineer"
+                    />
+                </div>
+
+                <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
+                    Next of Kin
+                </h3>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Name</label>
+                        <input
+                            type="text"
+                            name="next_of_kin_name"
+                            value={formData.next_of_kin_name}
+                            onChange={handleChange}
+                            placeholder="Next of kin name"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Relationship</label>
+                        <input
+                            type="text"
+                            name="next_of_kin_relationship"
+                            value={formData.next_of_kin_relationship}
+                            onChange={handleChange}
+                            placeholder="e.g. Spouse, Parent, Child"
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label>Next of Kin Phone</label>
+                    <input
+                        type="tel"
+                        name="next_of_kin_phone"
+                        value={formData.next_of_kin_phone}
+                        onChange={handleChange}
+                        placeholder="0400 123 456"
+                    />
+                </div>
+
                 <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
                     Address
                 </h3>
@@ -204,6 +272,196 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                             placeholder="(02) 1234 5678"
                         />
                     </div>
+                </div>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>GP Suburb</label>
+                        <input
+                            type="text"
+                            name="gp_suburb"
+                            value={formData.gp_suburb}
+                            onChange={handleChange}
+                            placeholder="Suburb"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>GP State</label>
+                        <select name="gp_state" value={formData.gp_state} onChange={handleChange}>
+                            <option value="NSW">NSW</option>
+                            <option value="VIC">VIC</option>
+                            <option value="QLD">QLD</option>
+                            <option value="SA">SA</option>
+                            <option value="WA">WA</option>
+                            <option value="TAS">TAS</option>
+                            <option value="NT">NT</option>
+                            <option value="ACT">ACT</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label>GP Postcode</label>
+                    <input
+                        type="text"
+                        name="gp_postcode"
+                        value={formData.gp_postcode}
+                        onChange={handleChange}
+                        placeholder="2153"
+                        maxLength="4"
+                    />
+                </div>
+
+                <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
+                    Other Treating Specialist (Optional)
+                </h3>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Specialist Name</label>
+                        <input
+                            type="text"
+                            name="other_specialist_name"
+                            value={formData.other_specialist_name}
+                            onChange={handleChange}
+                            placeholder="Dr. Name"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Specialist Phone</label>
+                        <input
+                            type="tel"
+                            name="other_specialist_phone"
+                            value={formData.other_specialist_phone}
+                            onChange={handleChange}
+                            placeholder="(02) 1234 5678"
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label>Specialist Address</label>
+                    <input
+                        type="text"
+                        name="other_specialist_address"
+                        value={formData.other_specialist_address}
+                        onChange={handleChange}
+                        placeholder="Full address"
+                    />
+                </div>
+
+                <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
+                    Health Cover (Optional)
+                </h3>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Health Fund Name</label>
+                        <input
+                            type="text"
+                            name="health_fund_name"
+                            value={formData.health_fund_name}
+                            onChange={handleChange}
+                            placeholder="e.g. Medibank, BUPA"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Membership Number</label>
+                        <input
+                            type="text"
+                            name="health_fund_membership"
+                            value={formData.health_fund_membership}
+                            onChange={handleChange}
+                            placeholder="Membership #"
+                        />
+                    </div>
+                </div>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Pension Number</label>
+                        <input
+                            type="text"
+                            name="pension_number"
+                            value={formData.pension_number}
+                            onChange={handleChange}
+                            placeholder="If applicable"
+                        />
+                    </div>
+                </div>
+
+                <h4 style={{ marginTop: '20px', marginBottom: '15px', color: 'var(--brand-navy)', fontSize: '1.1rem' }}>
+                    Veterans Affairs (Optional)
+                </h4>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>VA Number</label>
+                        <input
+                            type="text"
+                            name="veterans_affairs_number"
+                            value={formData.veterans_affairs_number}
+                            onChange={handleChange}
+                            placeholder="Veterans Affairs #"
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>VA Card Type</label>
+                        <select name="veterans_affairs_card_type" value={formData.veterans_affairs_card_type} onChange={handleChange}>
+                            <option value="">Select card type</option>
+                            <option value="Gold">Gold</option>
+                            <option value="White">White</option>
+                            <option value="Blue">Blue</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
+                    Additional Information
+                </h3>
+
+                <div className="checkbox-group">
+                    <input
+                        type="checkbox"
+                        id="workers_comp"
+                        name="workers_comp_claim"
+                        checked={formData.workers_comp_claim}
+                        onChange={handleChange}
+                    />
+                    <label htmlFor="workers_comp">
+                        This visit is related to a Workers Compensation claim
+                    </label>
+                </div>
+
+                {formData.workers_comp_claim && (
+                    <div className="form-group" style={{ marginTop: '15px' }}>
+                        <label>Workers Compensation Details</label>
+                        <textarea
+                            name="workers_comp_details"
+                            value={formData.workers_comp_details}
+                            onChange={handleChange}
+                            placeholder="Please provide details of your claim"
+                            rows="3"
+                            style={{ width: '100%', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1' }}
+                        />
+                    </div>
+                )}
+
+                <div className="checkbox-group" style={{ marginTop: '15px' }}>
+                    <input
+                        type="checkbox"
+                        id="legal_process"
+                        name="legal_process"
+                        checked={formData.legal_process}
+                        onChange={handleChange}
+                    />
+                    <label htmlFor="legal_process">
+                        I am currently going through a legal process related to this condition
+                    </label>
                 </div>
 
                 <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
