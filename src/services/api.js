@@ -49,8 +49,8 @@ export const appointmentAPI = {
     },
     // Removed lookup as per the provided edit
     availableSlots: (data) => api.post('/appointments/available_slots/', data),
-    myAppointments: (data) => api.post('/appointments/my_appointments/', data), // Added as per the provided edit
-    cancel: (id, reason) => api.post(`/appointments/${id}/cancel/`, { reason }), // Added as per the provided edit
+    myAppointments: (data) => api.post('/appointments/my_appointments/', data), 
+    cancel: (id, reason) => api.post(`/appointments/${id}/cancel/`, { reason }),
 };
 
 export default api;

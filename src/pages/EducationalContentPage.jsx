@@ -4,40 +4,39 @@ import PageLayout from '../components/PageLayout';
 const EducationalContentPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
 
-    // Sample educational videos - Replace VIDEO_ID with actual YouTube video IDs
     const videos = [
         {
-            id: 'dQw4w9WgXcQ', // Replace with actual video ID
+            id: 'AjWfY7SnMBI',
             title: 'Understanding Heart Disease',
             description: 'Learn about common heart conditions, risk factors, and how to protect your cardiovascular health.',
             category: 'heart-health'
         },
         {
-            id: 'dQw4w9WgXcQ', // Replace with actual video ID
+            id: 'AjWfY7SnMBI',
             title: 'What is an Echocardiogram?',
             description: 'Dr. Shahzad explains what to expect during an echocardiogram procedure.',
             category: 'procedures'
         },
         {
-            id: 'dQw4w9WgXcQ', // Replace with actual video ID
+            id: 'AjWfY7SnMBI',
             title: 'Managing High Blood Pressure',
             description: 'Essential tips for controlling hypertension through lifestyle and medication.',
             category: 'prevention'
         },
         {
-            id: 'dQw4w9WgXcQ', // Replace with actual video ID
+            id: 'AjWfY7SnMBI',
             title: 'Heart-Healthy Diet Tips',
             description: 'Nutrition advice for maintaining optimal cardiovascular health.',
             category: 'prevention'
         },
         {
-            id: 'dQw4w9WgXcQ', // Replace with actual video ID
+            id: 'AjWfY7SnMBI',
             title: 'Stress Testing Explained',
             description: 'Everything you need to know about cardiac stress testing.',
             category: 'procedures'
         },
         {
-            id: 'dQw4w9WgXcQ', // Replace with actual video ID
+            id: 'AjWfY7SnMBI',
             title: 'Recognizing Heart Attack Symptoms',
             description: 'Critical warning signs and when to seek emergency care.',
             category: 'heart-health'
