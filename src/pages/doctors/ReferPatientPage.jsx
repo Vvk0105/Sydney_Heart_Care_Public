@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PageLayout from '../../components/PageLayout';
+import { referralAPI } from '../../services/api';
 
 const ReferPatientPage = () => {
     const [formData, setFormData] = useState({
@@ -17,6 +18,8 @@ const ReferPatientPage = () => {
     });
     const [files, setFiles] = useState([]);
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -30,11 +33,28 @@ const ReferPatientPage = () => {
         setFiles(Array.from(e.target.files));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // TODO: Backend integration - send referral data
-        console.log('Referral submitted:', formData, files);
-        setSubmitted(true);
+        setLoading(true);
+        setError('');
+        try {
+            const data = new FormData();
+            data.append('referral_type', 'doctor');
+            Object.entries(formData).forEach(([key, value]) => {
+                data.append(key, value);
+            });
+            // Append first file as referral_file (backend stores one)
+            if (files.length > 0) {
+                data.append('referral_file', files[0]);
+            }
+            await referralAPI.submit(data);
+            setSubmitted(true);
+        } catch (err) {
+            console.error('Referral submission error:', err);
+            setError('Failed to submit referral. Please try again or contact the clinic directly.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -77,6 +97,12 @@ const ReferPatientPage = () => {
                     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
 
                         <form onSubmit={handleSubmit} className="booking-form">
+
+                            {error && (
+                                <div style={{ padding: '12px 16px', background: '#fee2e2', borderRadius: '8px', color: '#991b1b', marginBottom: '20px', borderLeft: '4px solid #ef4444' }}>
+                                    {error}
+                                </div>
+                            )}
 
                             <h3 style={{ marginBottom: '20px', color: 'var(--brand-navy)' }}>
                                 Referring Doctor Details
@@ -247,8 +273,8 @@ const ReferPatientPage = () => {
                             </div>
 
                             <div style={{ marginTop: '40px', display: 'flex', gap: '15px' }}>
-                                <button type="submit" className="btn btn-primary">
-                                    Submit Referral
+                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                    {loading ? 'Submitting...' : 'Submit Referral'}
                                 </button>
                             </div>
                         </form>

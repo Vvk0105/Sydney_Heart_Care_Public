@@ -53,4 +53,12 @@ export const appointmentAPI = {
     cancel: (id, reason) => api.post(`/appointments/${id}/cancel/`, { reason }),
 };
 
+// Referral API
+export const referralAPI = {
+    submit: (formData) => api.post('/referrals/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+};
+
 export default api;
+

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
+import { referralAPI } from '../services/api';
 
 const UploadReferralPage = () => {
     const [formData, setFormData] = useState({
@@ -14,6 +15,8 @@ const UploadReferralPage = () => {
     });
     const [file, setFile] = useState(null);
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -24,11 +27,27 @@ const UploadReferralPage = () => {
         setFile(e.target.files[0]);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // TODO: Backend integration - upload referral
-        console.log('Referral uploaded:', formData, file);
-        setSubmitted(true);
+        setLoading(true);
+        setError('');
+        try {
+            const data = new FormData();
+            data.append('referral_type', 'patient');
+            Object.entries(formData).forEach(([key, value]) => {
+                if (value) data.append(key, value);
+            });
+            if (file) {
+                data.append('referral_file', file);
+            }
+            await referralAPI.submit(data);
+            setSubmitted(true);
+        } catch (err) {
+            console.error('Referral upload error:', err);
+            setError('Failed to upload referral. Please try again or contact the clinic directly.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -91,6 +110,12 @@ const UploadReferralPage = () => {
                         </div>
 
                         <form onSubmit={handleSubmit} className="booking-form">
+
+                            {error && (
+                                <div style={{ padding: '12px 16px', background: '#fee2e2', borderRadius: '8px', color: '#991b1b', marginBottom: '20px', borderLeft: '4px solid #ef4444' }}>
+                                    {error}
+                                </div>
+                            )}
 
                             <h3 style={{ marginBottom: '20px', color: 'var(--brand-navy)' }}>
                                 Patient Information
@@ -218,8 +243,8 @@ const UploadReferralPage = () => {
                             </div>
 
                             <div style={{ marginTop: '30px', display: 'flex', gap: '15px', flexDirection: 'column' }}>
-                                <button type="submit" className="btn btn-primary">
-                                    Upload Referral
+                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                    {loading ? 'Uploading...' : 'Upload Referral'}
                                 </button>
                                 <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textAlign: 'center' }}>
                                     After uploading, you can proceed to book your appointment
