@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../components/PageLayout';
 import { referralAPI } from '../../services/api';
 
 const ReferPatientPage = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         gp_name: '',
         gp_practice: '',
@@ -17,7 +19,6 @@ const ReferPatientPage = () => {
         clinical_notes: '',
     });
     const [files, setFiles] = useState([]);
-    const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -48,7 +49,7 @@ const ReferPatientPage = () => {
                 data.append('referral_file', files[0]);
             }
             await referralAPI.submit(data);
-            setSubmitted(true);
+            navigate('/referral-success', { state: { type: 'doctor' } });
         } catch (err) {
             console.error('Referral submission error:', err);
             setError('Failed to submit referral. Please try again or contact the clinic directly.');
@@ -56,27 +57,6 @@ const ReferPatientPage = () => {
             setLoading(false);
         }
     };
-
-    if (submitted) {
-        return (
-            <PageLayout currentPage="">
-                <section className="hero">
-                    <div className="container">
-                        <div className="fade-in text-center" style={{ maxWidth: '600px', margin: '0 auto' }}>
-                            <div style={{ fontSize: '4rem', marginBottom: '20px' }}>✅</div>
-                            <h2 className="hero-title" style={{ fontSize: '2.5rem' }}>Referral Submitted</h2>
-                            <p className="hero-subtitle">
-                                Thank you for your referral. We will contact the patient shortly to arrange an appointment.
-                            </p>
-                            <button onClick={() => setSubmitted(false)} className="btn btn-primary" style={{ marginTop: '30px' }}>
-                                Submit Another Referral
-                            </button>
-                        </div>
-                    </div>
-                </section>
-            </PageLayout>
-        );
-    }
 
     return (
         <PageLayout currentPage="">

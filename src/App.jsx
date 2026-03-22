@@ -23,6 +23,7 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import EducationalContentPage from './pages/EducationalContentPage';
 import UploadReportsPage from './pages/UploadReportsPage';
 import UploadReferralPage from './pages/UploadReferralPage';
+import ReferralSuccessPage from './pages/ReferralSuccessPage';
 import './App.css';
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
                 {/* Upload Pages */}
                 <Route path="/upload-reports" element={<UploadReportsPage />} />
                 <Route path="/upload-referral" element={<UploadReferralPage />} />
+                <Route path="/referral-success" element={<ReferralSuccessPage />} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

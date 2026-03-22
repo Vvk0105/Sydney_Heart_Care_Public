@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PageLayout from '../components/PageLayout';
 import { referralAPI } from '../services/api';
 
 const UploadReferralPage = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         patient_name: '',
         medicare_number: '',
@@ -14,7 +15,6 @@ const UploadReferralPage = () => {
         preferred_appointment: ''
     });
     const [file, setFile] = useState(null);
-    const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -41,7 +41,7 @@ const UploadReferralPage = () => {
                 data.append('referral_file', file);
             }
             await referralAPI.submit(data);
-            setSubmitted(true);
+            navigate('/referral-success', { state: { type: 'patient' } });
         } catch (err) {
             console.error('Referral upload error:', err);
             setError('Failed to upload referral. Please try again or contact the clinic directly.');
@@ -49,32 +49,6 @@ const UploadReferralPage = () => {
             setLoading(false);
         }
     };
-
-    if (submitted) {
-        return (
-            <PageLayout currentPage="">
-                <section className="hero">
-                    <div className="container">
-                        <div className="fade-in text-center" style={{ maxWidth: '700px', margin: '0 auto' }}>
-                            <div style={{ fontSize: '4rem', marginBottom: '20px' }}>✅</div>
-                            <h2 className="hero-title" style={{ fontSize: '2.5rem' }}>Referral Received</h2>
-                            <p className="hero-subtitle" style={{ marginBottom: '30px' }}>
-                                Thank you! Your GP referral has been uploaded successfully. Our team will contact you soon to schedule your appointment.
-                            </p>
-                            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                                <Link to="/book" className="btn btn-primary">
-                                    Book Appointment Now
-                                </Link>
-                                <button onClick={() => { setSubmitted(false); setFile(null); }} className="btn btn-outline">
-                                    Upload Another Referral
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </PageLayout>
-        );
-    }
 
     return (
         <PageLayout currentPage="">
