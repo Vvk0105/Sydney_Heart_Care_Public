@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { patientAPI } from '../../services/api';
 
+// Validate Australian phone: strips spaces/dashes, checks 10-digit AU format
+const validateAUPhone = (phone) => {
+    const stripped = phone.replace(/[\s\-()]/g, '');
+    return /^0[2-9]\d{8}$/.test(stripped);
+};
+
 const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
     const [formData, setFormData] = useState({
         ...medicareData,
@@ -37,6 +43,7 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -45,10 +52,33 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
             [name]: type === 'checkbox' ? checked : value,
         }));
         setError('');
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => ({ ...prev, [name]: '' }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validate required fields
+        const errors = {};
+        if (!formData.gp_name.trim()) errors.gp_name = 'GP name is required.';
+        if (!formData.gp_phone.trim()) {
+            errors.gp_phone = 'GP phone is required.';
+        } else if (!validateAUPhone(formData.gp_phone)) {
+            errors.gp_phone = 'Enter a valid Australian phone (e.g. 02 9639 2929 or 0400 123 456).';
+        }
+        // Validate patient phone too
+        if (formData.phone && !validateAUPhone(formData.phone)) {
+            errors.phone = 'Enter a valid Australian phone (e.g. 02 9639 2929 or 0400 123 456).';
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
+            setError('Please correct the errors highlighted below.');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
 
         if (!formData.consent_given) {
             setError('Please provide consent to proceed.');
@@ -123,7 +153,12 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                             onChange={handleChange}
                             placeholder="0400 123 456"
                             required
+                            style={{ borderColor: fieldErrors.phone ? '#ef4444' : undefined }}
                         />
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '3px' }}>
+                            Format: 02 XXXX XXXX (landline) or 04XX XXX XXX (mobile)
+                        </p>
+                        {fieldErrors.phone && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.phone}</p>}
                     </div>
 
                     <div className="form-group">
@@ -246,31 +281,42 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                     />
                 </div>
 
-                <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
-                    GP Details (Optional)
+                <h3 style={{ marginTop: '30px', marginBottom: '4px', color: 'var(--brand-navy)' }}>
+                    GP Details
                 </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
+                    Your referring GP details are required.
+                </p>
 
                 <div className="form-row">
                     <div className="form-group">
-                        <label>GP Name</label>
+                        <label className="required">GP Name</label>
                         <input
                             type="text"
                             name="gp_name"
                             value={formData.gp_name}
                             onChange={handleChange}
                             placeholder="Dr. Jane Doe"
+                            style={{ borderColor: fieldErrors.gp_name ? '#ef4444' : undefined }}
                         />
+                        {fieldErrors.gp_name && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.gp_name}</p>}
                     </div>
 
                     <div className="form-group">
-                        <label>GP Phone</label>
+                        <label className="required">GP Phone</label>
                         <input
                             type="tel"
                             name="gp_phone"
                             value={formData.gp_phone}
                             onChange={handleChange}
-                            placeholder="(02) 1234 5678"
+                            placeholder="02 9639 2929"
+                            maxLength={14}
+                            style={{ borderColor: fieldErrors.gp_phone ? '#ef4444' : undefined }}
                         />
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '3px' }}>
+                            Format: 02 XXXX XXXX (landline) or 04XX XXX XXX (mobile)
+                        </p>
+                        {fieldErrors.gp_phone && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.gp_phone}</p>}
                     </div>
                 </div>
 
