@@ -2,7 +2,8 @@ import React from 'react';
 import PageLayout from '../../components/PageLayout';
 
 const DoctorsContactPage = () => {
-    const whatsappNumber = '61296392929'; // Format: country code + number without leading 0
+    // 61296392929
+    const whatsappNumber = '0412705370'; // Format: country code + number without leading 0
     const whatsappLink = `https://wa.me/${whatsappNumber}`;
 
     return (
@@ -64,7 +65,7 @@ const DoctorsContactPage = () => {
                             </a>
 
                             <p style={{ marginTop: '20px', fontSize: '1.1rem', fontWeight: '600', color: 'var(--brand-red)' }}>
-                                02 9639 2929
+                                04 1270 5370
                             </p>
                         </div>
 
