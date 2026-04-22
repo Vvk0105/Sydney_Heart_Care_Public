@@ -3,8 +3,11 @@ import PageLayout from '../../components/PageLayout';
 
 const DoctorsContactPage = () => {
     // 61296392929
-    const whatsappNumber = '0412705370'; // Format: country code + number without leading 0
-    const whatsappLink = `https://wa.me/${whatsappNumber}`;
+    const whatsappNumber = '+610412705370';
+
+    const message = "Hello Sydney Heart Care, I would like to enquire about your services.";
+
+    const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
     return (
         <PageLayout currentPage="">
