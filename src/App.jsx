@@ -24,6 +24,7 @@ import EducationalContentPage from './pages/EducationalContentPage';
 import UploadReportsPage from './pages/UploadReportsPage';
 import UploadReferralPage from './pages/UploadReferralPage';
 import ReferralSuccessPage from './pages/ReferralSuccessPage';
+import WhatsAppButton from './components/WhatsAppButton';
 import './App.css';
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
 
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            <WhatsAppButton />
         </Router>
     );
 }

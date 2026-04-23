@@ -73,6 +73,7 @@ const PageLayout = ({ children, currentPage = '' }) => {
                 </div>
             </footer>
         </div>
+
     );
 };
 
