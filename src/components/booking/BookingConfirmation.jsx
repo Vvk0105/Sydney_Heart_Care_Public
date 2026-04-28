@@ -6,15 +6,15 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
     const [error, setError] = useState('');
     const [confirmed, setConfirmed] = useState(false);
     const [bookingReference, setBookingReference] = useState('');
-    const [referralFile, setReferralFile] = useState(null);
-    const [reportsFile, setReportsFile] = useState(null);
+    const [referralFiles, setReferralFiles] = useState([]);
+    const [reportsFiles, setReportsFiles] = useState([]);
 
     const handleFileChange = (e, type) => {
-        const file = e.target.files[0];
+        const files = Array.from(e.target.files);
         if (type === 'referral') {
-            setReferralFile(file);
+            setReferralFiles(files);
         } else {
-            setReportsFile(file);
+            setReportsFiles(files);
         }
     };
 
@@ -30,8 +30,8 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                 start_time: bookingData.selectedSlot.start_time,
                 end_time: bookingData.selectedSlot.end_time,
                 cancellation_policy_accepted: true,
-                referral_file: referralFile,
-                reports_file: reportsFile,
+                referral_files: referralFiles,
+                reports_files: reportsFiles,
             };
 
             const response = await appointmentAPI.create(appointmentData);
@@ -156,29 +156,41 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
 
             {bookingData.appointmentType.requires_referral && (
                 <div className="form-group" style={{ marginTop: '30px' }}>
-                    <label className="required">Upload Referral</label>
+                    <label className="required">Upload Referral (One or more)</label>
                     <input
                         type="file"
                         accept=".pdf,.jpg,.jpeg,.png"
+                        multiple
                         onChange={(e) => handleFileChange(e, 'referral')}
                     />
                     <small style={{ color: 'var(--text-muted)' }}>
-                        Accepted formats: PDF, JPG, PNG (Max 5MB)
+                        Accepted formats: PDF, JPG, PNG (Max 5MB per file)
                     </small>
+                    {referralFiles.length > 0 && (
+                        <div style={{ marginTop: '10px', fontSize: '14px' }}>
+                            Selected: {referralFiles.length} file(s)
+                        </div>
+                    )}
                 </div>
             )}
 
             {bookingData.appointmentType.requires_reports && (
                 <div className="form-group" style={{ marginTop: '20px' }}>
-                    <label>Upload Medical Reports (Optional)</label>
+                    <label>Upload Medical Reports (One or more)</label>
                     <input
                         type="file"
                         accept=".pdf,.jpg,.jpeg,.png"
+                        multiple
                         onChange={(e) => handleFileChange(e, 'reports')}
                     />
                     <small style={{ color: 'var(--text-muted)' }}>
-                        Accepted formats: PDF, JPG, PNG (Max 5MB)
+                        Accepted formats: PDF, JPG, PNG (Max 5MB per file)
                     </small>
+                    {reportsFiles.length > 0 && (
+                        <div style={{ marginTop: '10px', fontSize: '14px' }}>
+                            Selected: {reportsFiles.length} file(s)
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -199,7 +211,7 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                     onClick={handleConfirm}
                     disabled={
                         loading ||
-                        (bookingData.appointmentType.requires_referral && !referralFile)
+                        (bookingData.appointmentType.requires_referral && referralFiles.length === 0)
                     }
                 >
                     {loading ? 'Confirming...' : 'Confirm Booking'}

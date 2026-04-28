@@ -40,7 +40,13 @@ export const appointmentAPI = {
         const formData = new FormData();
         Object.keys(data).forEach(key => {
             if (data[key] !== null && data[key] !== undefined) {
-                formData.append(key, data[key]);
+                if (Array.isArray(data[key])) {
+                    data[key].forEach(item => {
+                        formData.append(key, item);
+                    });
+                } else {
+                    formData.append(key, data[key]);
+                }
             }
         });
         return api.post('/appointments/', formData, {
