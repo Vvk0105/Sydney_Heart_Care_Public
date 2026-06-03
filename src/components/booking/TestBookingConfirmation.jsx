@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { appointmentAPI } from '../../services/api';
+import { testAPI } from '../../services/api';
 
-const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) => {
+const TestBookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [confirmed, setConfirmed] = useState(false);
@@ -23,9 +23,9 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
         setError('');
 
         try {
-            const appointmentData = {
+            const testData = {
                 patient: bookingData.patient.id || bookingData.patient.patient_id,
-                appointment_type: bookingData.appointmentType.id,
+                test_type: bookingData.testType.id,
                 date: bookingData.selectedDate,
                 start_time: bookingData.selectedSlot.start_time,
                 end_time: bookingData.selectedSlot.end_time,
@@ -34,17 +34,18 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                 reports_file: reportsFile,
             };
 
-            const response = await appointmentAPI.create(appointmentData);
+            const response = await testAPI.create(testData);
             setBookingReference(response.data.booking_reference);
             setConfirmed(true);
             onComplete(response.data.booking_reference);
         } catch (err) {
+            // Show backend validation error messages
             const errData = err.response?.data;
             if (errData) {
                 const msgs = Object.values(errData).flat();
-                setError(msgs.join(' ') || 'Failed to create appointment. Please try again.');
+                setError(msgs.join(' ') || 'Failed to create test booking. Please try again.');
             } else {
-                setError('Failed to create appointment. Please try again.');
+                setError('Failed to create test booking. Please try again.');
             }
             console.error(err);
         } finally {
@@ -56,10 +57,10 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
         return (
             <div className="confirmation-box">
                 <div className="icon">✅</div>
-                <h2>Booking Confirmed!</h2>
+                <h2>Test Booking Confirmed!</h2>
                 <p className="booking-reference">Reference: {bookingReference}</p>
                 <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>
-                    Your appointment has been successfully booked. Please save this reference number.
+                    Your test booking has been successfully created. Please save this reference number.
                 </p>
 
                 <div className="confirmation-details">
@@ -68,8 +69,8 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                         <span className="detail-value">{bookingData.patient.full_name}</span>
                     </div>
                     <div className="detail-row">
-                        <span className="detail-label">Appointment Type:</span>
-                        <span className="detail-value">{bookingData.appointmentType.name}</span>
+                        <span className="detail-label">Test Type:</span>
+                        <span className="detail-value">{bookingData.testType.name}</span>
                     </div>
                     <div className="detail-row">
                         <span className="detail-label">Date:</span>
@@ -95,7 +96,7 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                     <strong>What's Next?</strong>
                     <ul style={{ textAlign: 'left', marginTop: '10px', paddingLeft: '20px' }}>
                         <li>You will receive a confirmation email/SMS shortly</li>
-                        <li>Please arrive 10 minutes before your appointment</li>
+                        <li>Please arrive 10 minutes before your test</li>
                         <li>Bring your Medicare card and referral (if applicable)</li>
                         <li>For cancellations, call 02 9639 2929 at least 24 hours in advance</li>
                     </ul>
@@ -103,7 +104,7 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
 
                 <div className="action-buttons centered">
                     <button type="button" className="btn btn-primary" onClick={onStartOver}>
-                        Book Another Appointment
+                        Book Another Test
                     </button>
                 </div>
             </div>
@@ -112,9 +113,9 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
 
     return (
         <div className="booking-confirmation">
-            <h2>Confirm Your Booking</h2>
+            <h2>Confirm Your Test Booking</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>
-                Please review your appointment details before confirming.
+                Please review your test booking details before confirming.
             </p>
 
             {error && <div className="error-message">{error}</div>}
@@ -133,12 +134,12 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                     </span>
                 </div>
                 <div className="detail-row">
-                    <span className="detail-label">Appointment Type:</span>
-                    <span className="detail-value">{bookingData.appointmentType.name}</span>
+                    <span className="detail-label">Test Type:</span>
+                    <span className="detail-value">{bookingData.testType.name}</span>
                 </div>
                 <div className="detail-row">
                     <span className="detail-label">Duration:</span>
-                    <span className="detail-value">{bookingData.appointmentType.duration_minutes} minutes</span>
+                    <span className="detail-value">{bookingData.testType.duration_minutes} minutes</span>
                 </div>
                 <div className="detail-row">
                     <span className="detail-label">Date:</span>
@@ -160,7 +161,7 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                 </div>
             </div>
 
-            {bookingData.appointmentType.requires_referral && (
+            {bookingData.testType.requires_referral && (
                 <div className="form-group" style={{ marginTop: '30px' }}>
                     <label className="required">Upload Referral</label>
                     <input
@@ -174,7 +175,7 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                 </div>
             )}
 
-            {bookingData.appointmentType.requires_reports && (
+            {bookingData.testType.requires_reports && (
                 <div className="form-group" style={{ marginTop: '20px' }}>
                     <label>Upload Medical Reports (Optional)</label>
                     <input
@@ -205,14 +206,14 @@ const BookingConfirmation = ({ bookingData, onComplete, onBack, onStartOver }) =
                     onClick={handleConfirm}
                     disabled={
                         loading ||
-                        (bookingData.appointmentType.requires_referral && !referralFile)
+                        (bookingData.testType.requires_referral && !referralFile)
                     }
                 >
-                    {loading ? 'Confirming...' : 'Confirm Booking'}
+                    {loading ? 'Confirming...' : 'Confirm Test Booking'}
                 </button>
             </div>
         </div>
     );
 };
 
-export default BookingConfirmation;
+export default TestBookingConfirmation;

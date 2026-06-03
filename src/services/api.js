@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'; // Reverted to original as the provided edit was malformed
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 // Create axios instance
 const api = axios.create({
-    baseURL: API_BASE_URL, // Using API_BASE_URL as in original, the edit's baseURL was inconsistent with its own API_BASE_URL definition
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -25,13 +25,16 @@ api.interceptors.response.use(
 export const patientAPI = {
     lookup: (data) => api.post('/patients/lookup/', data),
     register: (data) => api.post('/patients/register/', data),
-    // Removed getById, getHistory, update as per the provided edit
 };
 
-// Appointment Type API  
+// Appointment Type API
 export const appointmentTypeAPI = {
     list: () => api.get('/appointment-types/'),
-    // Removed getById as per the provided edit
+};
+
+// Test Type API
+export const testTypeAPI = {
+    list: () => api.get('/test-types/'),
 };
 
 // Appointment API
@@ -47,10 +50,31 @@ export const appointmentAPI = {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
     },
-    // Removed lookup as per the provided edit
     availableSlots: (data) => api.post('/appointments/available_slots/', data),
-    myAppointments: (data) => api.post('/appointments/my_appointments/', data), 
+    myAppointments: (data) => api.post('/appointments/my_appointments/', data),
     cancel: (id, reason) => api.post(`/appointments/${id}/cancel/`, { reason }),
+    nextAvailableDate: (appointmentTypeId) =>
+        api.get(`/appointments/next_available_date/?appointment_type_id=${appointmentTypeId}`),
+};
+
+// Test API
+export const testAPI = {
+    create: (data) => {
+        const formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (data[key] !== null && data[key] !== undefined) {
+                formData.append(key, data[key]);
+            }
+        });
+        return api.post('/tests/', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    },
+    availableSlots: (data) => api.post('/tests/available_slots/', data),
+    myTests: (data) => api.post('/tests/my_tests/', data),
+    cancel: (id, reason) => api.post(`/tests/${id}/cancel/`, { reason }),
+    nextAvailableDate: (testTypeId) =>
+        api.get(`/tests/next_available_date/?test_type_id=${testTypeId}`),
 };
 
 // Referral API
@@ -61,4 +85,3 @@ export const referralAPI = {
 };
 
 export default api;
-

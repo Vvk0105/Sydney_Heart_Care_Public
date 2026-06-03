@@ -2,56 +2,50 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientLookup from '../components/booking/PatientLookup';
 import PatientRegistration from '../components/booking/PatientRegistration';
-import AppointmentTypeSelection from '../components/booking/AppointmentTypeSelection';
+import TestTypeSelection from '../components/booking/TestTypeSelection';
 import SlotSelection from '../components/booking/SlotSelection';
-import BookingConfirmation from '../components/booking/BookingConfirmation';
+import TestBookingConfirmation from '../components/booking/TestBookingConfirmation';
 import './BookingPage.css';
 
 const STEPS = {
     PATIENT_LOOKUP: 1,
     PATIENT_REGISTRATION: 2,
-    APPOINTMENT_TYPE: 3,
+    TEST_TYPE: 3,
     SLOT_SELECTION: 4,
     CONFIRMATION: 5,
 };
 
-const BookingPage = () => {
+const TestBookingPage = () => {
     const navigate = useNavigate();
 
     // Initialize state from localStorage or defaults
     const getInitialState = () => {
-        const saved = localStorage.getItem('bookingState');
+        const saved = localStorage.getItem('testBookingState');
         if (saved) {
             try {
                 return JSON.parse(saved);
             } catch (e) {
-                return {
-                    currentStep: STEPS.PATIENT_LOOKUP,
-                    patient: null,
-                    patientExists: false,
-                    appointmentType: null,
-                    selectedSlot: null,
-                    selectedDate: null,
-                    bookingReference: null,
-                };
+                return getDefaultState();
             }
         }
-        return {
-            currentStep: STEPS.PATIENT_LOOKUP,
-            patient: null,
-            patientExists: false,
-            appointmentType: null,
-            selectedSlot: null,
-            selectedDate: null,
-            bookingReference: null,
-        };
+        return getDefaultState();
     };
+
+    const getDefaultState = () => ({
+        currentStep: STEPS.PATIENT_LOOKUP,
+        patient: null,
+        patientExists: false,
+        testType: null,
+        selectedSlot: null,
+        selectedDate: null,
+        bookingReference: null,
+    });
 
     const [state, setState] = useState(getInitialState);
 
     // Save state to localStorage whenever it changes
     useEffect(() => {
-        localStorage.setItem('bookingState', JSON.stringify(state));
+        localStorage.setItem('testBookingState', JSON.stringify(state));
     }, [state]);
 
     const updateState = (newData) => {
@@ -62,7 +56,7 @@ const BookingPage = () => {
         updateState({
             patient,
             patientExists: exists,
-            currentStep: exists ? STEPS.APPOINTMENT_TYPE : STEPS.PATIENT_REGISTRATION
+            currentStep: exists ? STEPS.TEST_TYPE : STEPS.PATIENT_REGISTRATION
         });
     };
 
@@ -70,13 +64,13 @@ const BookingPage = () => {
         updateState({
             patient,
             patientExists: true,
-            currentStep: STEPS.APPOINTMENT_TYPE
+            currentStep: STEPS.TEST_TYPE
         });
     };
 
-    const handleAppointmentTypeSelected = (appointmentType) => {
+    const handleTestTypeSelected = (testType) => {
         updateState({
-            appointmentType,
+            testType,
             currentStep: STEPS.SLOT_SELECTION
         });
     };
@@ -94,20 +88,12 @@ const BookingPage = () => {
     };
 
     const handleStartOver = () => {
-        localStorage.removeItem('bookingState');
-        setState({
-            currentStep: STEPS.PATIENT_LOOKUP,
-            patient: null,
-            patientExists: false,
-            appointmentType: null,
-            selectedSlot: null,
-            selectedDate: null,
-            bookingReference: null,
-        });
+        localStorage.removeItem('testBookingState');
+        setState(getDefaultState());
     };
 
     const handleBackToHome = () => {
-        localStorage.removeItem('bookingState');
+        localStorage.removeItem('testBookingState');
         navigate('/');
     };
 
@@ -128,25 +114,25 @@ const BookingPage = () => {
                         onBack={() => updateState({ currentStep: STEPS.PATIENT_LOOKUP })}
                     />
                 );
-            case STEPS.APPOINTMENT_TYPE:
+            case STEPS.TEST_TYPE:
                 return (
-                    <AppointmentTypeSelection
-                        onSelect={handleAppointmentTypeSelected}
+                    <TestTypeSelection
+                        onSelect={handleTestTypeSelected}
                         onBack={() => updateState({ currentStep: STEPS.PATIENT_LOOKUP })}
                     />
                 );
             case STEPS.SLOT_SELECTION:
                 return (
                     <SlotSelection
-                        appointmentType={state.appointmentType}
-                        bookingMode="appointment"
+                        testType={state.testType}
+                        bookingMode="test"
                         onSelect={handleSlotSelected}
-                        onBack={() => updateState({ currentStep: STEPS.APPOINTMENT_TYPE })}
+                        onBack={() => updateState({ currentStep: STEPS.TEST_TYPE })}
                     />
                 );
             case STEPS.CONFIRMATION:
                 return (
-                    <BookingConfirmation
+                    <TestBookingConfirmation
                         bookingData={state}
                         onComplete={handleBookingComplete}
                         onBack={() => updateState({ currentStep: STEPS.SLOT_SELECTION })}
@@ -161,7 +147,7 @@ const BookingPage = () => {
     const getStepIndicator = () => {
         const steps = [
             { number: 1, label: 'Patient Info' },
-            { number: 3, label: 'Appointment Type' },
+            { number: 3, label: 'Test Type' },
             { number: 4, label: 'Select Slot' },
             { number: 5, label: 'Confirm' },
         ];
@@ -188,7 +174,7 @@ const BookingPage = () => {
                     <h1 onClick={handleBackToHome} style={{ cursor: 'pointer' }}>
                         Sydney Heart Care
                     </h1>
-                    <p>Book Your Appointment</p>
+                    <p>Book Your Test</p>
                 </div>
             </div>
 
@@ -204,4 +190,4 @@ const BookingPage = () => {
     );
 };
 
-export default BookingPage;
+export default TestBookingPage;

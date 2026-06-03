@@ -86,8 +86,9 @@ const Header = ({ currentPage = '' }) => {
                                 </button>
                                 <ul className={`dropdown-menu ${openDropdown === 'patients' ? 'show' : ''}`}>
                                     <li><Link to="/faq" onClick={closeMenus}>FAQs</Link></li>
-                                    <li><Link to="/fees" onClick={closeMenus}>Fees & Billing</Link></li>
+                                    <li><Link to="/fees" onClick={closeMenus}>Fees &amp; Billing</Link></li>
                                     <li><Link to="/book" onClick={closeMenus}>Book Appointment</Link></li>
+                                    <li><Link to="/book-test" onClick={closeMenus}>Book a Test</Link></li>
                                     <li><Link to="/my-appointments" onClick={closeMenus}>My Appointments</Link></li>
                                     <li><Link to="/upload-reports" onClick={closeMenus}>Upload Reports</Link></li>
                                     <li><Link to="/upload-referral" onClick={closeMenus}>Upload GP Referral</Link></li>
@@ -130,7 +131,10 @@ const Header = ({ currentPage = '' }) => {
                                 </Link>
                             </li>
                         </ul>
-                        <Link to="/book" className="btn btn-primary nav-btn" onClick={closeMenus}>Book Appointment</Link>
+                        <div className="nav-actions">
+                            <Link to="/book" className="btn btn-primary nav-btn" onClick={closeMenus}>Book Appointment</Link>
+                            <Link to="/book-test" className="btn btn-secondary nav-btn" onClick={closeMenus}>Book a Test</Link>
+                        </div>
                     </nav>
                 </div>
             </header>

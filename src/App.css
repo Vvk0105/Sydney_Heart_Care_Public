@@ -98,10 +98,25 @@ h6 {
 .btn-primary {
     background-color: var(--brand-red);
     color: var(--bg-white);
+    border: 2px solid var(--brand-red);
 }
 
 .btn-primary:hover {
     background-color: var(--brand-red-hover);
+    border-color: var(--brand-red-hover);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--brand-navy);
+    border: 2px solid var(--brand-navy);
+}
+
+.btn-secondary:hover {
+    background-color: var(--brand-navy);
+    color: var(--bg-white);
     box-shadow: var(--shadow-hover);
     transform: translateY(-2px);
 }
@@ -109,12 +124,14 @@ h6 {
 .btn-outline {
     background-color: transparent;
     color: var(--brand-navy);
-    border-color: var(--brand-navy);
+    border: 2px solid var(--brand-navy);
 }
 
 .btn-outline:hover {
     background-color: var(--brand-navy);
     color: var(--bg-white);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
 }
 
 .btn-block {
@@ -175,6 +192,22 @@ h6 {
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.nav-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.header .nav-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-list {
@@ -662,6 +695,22 @@ section {
     transition-delay: 0.4s;
 }
 
+@media (max-width: 1024px) {
+    .nav-list {
+        gap: 15px;
+    }
+    .main-nav {
+        gap: 15px;
+    }
+    .logo-text {
+        font-size: 1.3rem;
+    }
+    .header .nav-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+}
+
 @media (max-width: 992px) {
 
     .hero-grid,
@@ -720,9 +769,17 @@ section {
         gap: 15px;
     }
 
-    .nav-btn {
+    .nav-actions {
+        display: flex;
+        flex-direction: column;
         width: 100%;
+        gap: 10px;
         margin-top: 15px;
+    }
+
+    .nav-actions .nav-btn {
+        width: 100%;
+        margin-top: 0;
     }
 
     .hero-title {

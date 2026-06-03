@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import BookingPage from './pages/BookingPage';
+import TestBookingPage from './pages/TestBookingPage';
 import MyAppointments from './pages/MyAppointments';
 import ServicesPage from './pages/services/ServicesPage';
 import EchocardiogramPage from './pages/services/EchocardiogramPage';
@@ -33,6 +34,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/book" element={<BookingPage />} />
+                <Route path="/book-test" element={<TestBookingPage />} />
                 <Route path="/my-appointments" element={<MyAppointments />} />
 
                 {/* Service Pages */}

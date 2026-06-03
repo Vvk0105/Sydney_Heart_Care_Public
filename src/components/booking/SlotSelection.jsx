@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { appointmentAPI } from '../../services/api';
+import { appointmentAPI, testAPI } from '../../services/api';
 
-const SlotSelection = ({ appointmentType, onSelect, onBack }) => {
+const SlotSelection = ({ appointmentType, testType, bookingMode = 'appointment', onSelect, onBack }) => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [loading, setLoading] = useState(false);
     const [slots, setSlots] = useState([]);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [error, setError] = useState('');
+    const [nextAvailableDate, setNextAvailableDate] = useState(null);
+    const [loadingNextDate, setLoadingNextDate] = useState(true);
+
+    // The booking type object (either appointment type or test type)
+    const bookingTypeObj = bookingMode === 'test' ? testType : appointmentType;
 
     // Allow booking from today onwards
     const today = new Date();
@@ -18,16 +23,45 @@ const SlotSelection = ({ appointmentType, onSelect, onBack }) => {
     maxDate.setMonth(maxDate.getMonth() + 3);
     const maxDateStr = maxDate.toISOString().split('T')[0];
 
+    useEffect(() => {
+        fetchNextAvailableDate();
+    }, []);
+
+    const fetchNextAvailableDate = async () => {
+        setLoadingNextDate(true);
+        try {
+            let response;
+            if (bookingMode === 'test') {
+                response = await testAPI.nextAvailableDate(bookingTypeObj.id);
+            } else {
+                response = await appointmentAPI.nextAvailableDate(bookingTypeObj.id);
+            }
+            setNextAvailableDate(response.data.next_available_date);
+        } catch (err) {
+            console.error('Failed to fetch next available date:', err);
+        } finally {
+            setLoadingNextDate(false);
+        }
+    };
+
     const fetchSlots = async (date) => {
         setLoading(true);
         setError('');
         setSelectedSlot(null);
 
         try {
-            const response = await appointmentAPI.availableSlots({
-                date,
-                appointment_type_id: appointmentType.id,
-            });
+            let response;
+            if (bookingMode === 'test') {
+                response = await testAPI.availableSlots({
+                    date,
+                    test_type_id: bookingTypeObj.id,
+                });
+            } else {
+                response = await appointmentAPI.availableSlots({
+                    date,
+                    appointment_type_id: bookingTypeObj.id,
+                });
+            }
             setSlots(response.data.slots || []);
         } catch (err) {
             setError('Failed to load available slots.');
@@ -55,12 +89,55 @@ const SlotSelection = ({ appointmentType, onSelect, onBack }) => {
         }
     };
 
+    const formatNextDate = (dateStr) => {
+        if (!dateStr) return null;
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('en-AU', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+        });
+    };
+
+    const bookingLabel = bookingMode === 'test' ? 'Test' : 'Appointment';
+
     return (
         <div className="slot-selection">
             <h2>Select Date & Time</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>
-                Choose a convenient date and time for your {appointmentType.name}.
+            <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>
+                Choose a convenient date and time for your {bookingTypeObj.name}.
             </p>
+
+            {/* Next Available Date Banner */}
+            {!loadingNextDate && nextAvailableDate && (
+                <div className="next-available-banner">
+                    <div className="next-available-pulse"></div>
+                    <div className="next-available-content">
+                        <span className="next-available-icon">📅</span>
+                        <div>
+                            <strong>Next Available {bookingLabel} Date</strong>
+                            <p>
+                                The next available date is{' '}
+                                <strong>{formatNextDate(nextAvailableDate)}</strong>.
+                                You may also select other dates to check availability.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {!loadingNextDate && !nextAvailableDate && (
+                <div className="next-available-banner next-available-banner--none">
+                    <div className="next-available-content">
+                        <span className="next-available-icon">⚠️</span>
+                        <div>
+                            <strong>No Available Dates</strong>
+                            <p>There are no available slots in the next 90 days. Please contact us directly.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="calendar-container">
                 <div className="date-selector">
