@@ -26,11 +26,13 @@ import UploadReportsPage from './pages/UploadReportsPage';
 import UploadReferralPage from './pages/UploadReferralPage';
 import ReferralSuccessPage from './pages/ReferralSuccessPage';
 import WhatsAppButton from './components/WhatsAppButton';
+import { ToastProvider } from './context/ToastContext';
 import './App.css';
 
 function App() {
     return (
-        <Router>
+        <ToastProvider>
+            <Router>
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/book" element={<BookingPage />} />
@@ -72,8 +74,8 @@ function App() {
             </Routes>
             <WhatsAppButton />
         </Router>
+        </ToastProvider>
     );
 }
-
 
 export default App;

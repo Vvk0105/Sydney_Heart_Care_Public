@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { patientAPI } from '../../services/api';
+import { patientAPI, extractErrorMessage } from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 const PatientLookup = ({ onComplete, onCancel }) => {
     const [formData, setFormData] = useState({
@@ -8,17 +9,31 @@ const PatientLookup = ({ onComplete, onCancel }) => {
         date_of_birth: '',
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const toast = useToast();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-        setError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+
+        if (!/^\d{10}$/.test(formData.medicare_number)) {
+            toast.error('Medicare number must be exactly 10 digits.');
+            return;
+        }
+
+        if (!/^[1-9]$/.test(formData.medicare_irn)) {
+            toast.error('IRN must be a single digit between 1 and 9.');
+            return;
+        }
+
+        if (!formData.date_of_birth) {
+            toast.error('Date of birth is required.');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -26,8 +41,9 @@ const PatientLookup = ({ onComplete, onCancel }) => {
 
             if (response.data.exists) {
                 if (response.data.has_unpaid_penalty) {
-                    setError(
-                        'You have an unpaid cancellation penalty. Please contact the clinic at (02) 9639 2929 to make payment before booking another appointment.'
+                    toast.error(
+                        'You have an unpaid cancellation penalty. Please contact the clinic at (02) 9639 2929 to make payment before booking another appointment.',
+                        10000 // Show longer for this important message
                     );
                     setLoading(false);
                     return;
@@ -38,7 +54,7 @@ const PatientLookup = ({ onComplete, onCancel }) => {
                 onComplete(formData, false);
             }
         } catch (err) {
-            setError('Failed to lookup patient details. Please try again.');
+            toast.error(extractErrorMessage(err));
             console.error(err);
         } finally {
             setLoading(false);
@@ -51,8 +67,6 @@ const PatientLookup = ({ onComplete, onCancel }) => {
             <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>
                 Please enter your Medicare details to continue with the booking.
             </p>
-
-            {error && <div className="error-message">{error}</div>}
 
             <form onSubmit={handleSubmit} className="booking-form">
                 <div className="form-group">

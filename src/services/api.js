@@ -77,11 +77,34 @@ export const testAPI = {
         api.get(`/tests/next_available_date/?test_type_id=${testTypeId}`),
 };
 
-// Referral API
 export const referralAPI = {
     submit: (formData) => api.post('/referrals/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     }),
+};
+
+// Helper to format DRF error responses
+export const extractErrorMessage = (error) => {
+    if (error.response?.data) {
+        const data = error.response.data;
+        if (typeof data === 'string') return data;
+        if (data.error) return data.error;
+        if (data.detail) return data.detail;
+        
+        // Extract array of strings from DRF dictionary
+        const messages = [];
+        for (const key in data) {
+            if (Array.isArray(data[key])) {
+                messages.push(`${data[key].join(' ')}`);
+            } else if (typeof data[key] === 'string') {
+                messages.push(`${data[key]}`);
+            }
+        }
+        if (messages.length > 0) {
+            return messages.join('\n');
+        }
+    }
+    return error.message || 'An unexpected error occurred. Please try again.';
 };
 
 export default api;

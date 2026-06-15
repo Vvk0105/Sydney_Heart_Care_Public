@@ -1,10 +1,29 @@
 import React, { useState } from 'react';
-import { patientAPI } from '../../services/api';
+import { patientAPI, extractErrorMessage } from '../../services/api';
+import { useToast } from '../../context/ToastContext';
 
 // Validate Australian phone: strips spaces/dashes, checks 10-digit AU format
 const validateAUPhone = (phone) => {
     const stripped = phone.replace(/[\s\-()]/g, '');
     return /^0[2-9]\d{8}$/.test(stripped);
+};
+
+// Format Australian phone while typing
+const formatAUPhone = (value) => {
+    const digits = value.replace(/\D/g, '');
+    
+    if (digits.startsWith('04')) {
+        // Format: 04XX XXX XXX
+        if (digits.length <= 4) return digits;
+        if (digits.length <= 7) return `${digits.slice(0, 4)} ${digits.slice(4)}`;
+        return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 10)}`;
+    } else if (digits.length > 0) {
+        // Format: 0X XXXX XXXX (landline)
+        if (digits.length <= 2) return digits;
+        if (digits.length <= 6) return `${digits.slice(0, 2)} ${digits.slice(2)}`;
+        return `${digits.slice(0, 2)} ${digits.slice(2, 6)} ${digits.slice(6, 10)}`;
+    }
+    return digits;
 };
 
 const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
@@ -42,19 +61,27 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
         cancellation_policy_accepted: false,
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [fieldErrors, setFieldErrors] = useState({});
+    const toast = useToast();
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        let { name, value, type, checked } = e.target;
+        
+        if (['phone', 'gp_phone', 'next_of_kin_phone', 'other_specialist_phone'].includes(name)) {
+            value = formatAUPhone(value);
+        }
+
         setFormData((prev) => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value,
         }));
-        setError('');
         if (fieldErrors[name]) {
             setFieldErrors(prev => ({ ...prev, [name]: '' }));
         }
+    };
+
+    const validateEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
     const handleSubmit = async (e) => {
@@ -62,42 +89,86 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
 
         // Validate required fields
         const errors = {};
+        
+        if (!formData.full_name.trim()) errors.full_name = 'Full name is required.';
+        
+        if (!formData.phone.trim()) {
+            errors.phone = 'Phone number is required.';
+        } else if (!validateAUPhone(formData.phone)) {
+            errors.phone = 'Enter a valid Australian phone (e.g. 02 9639 2929 or 0400 123 456).';
+        }
+
+        if (!formData.email.trim()) {
+            errors.email = 'Email is required.';
+        } else if (!validateEmail(formData.email)) {
+            errors.email = 'Enter a valid email address.';
+        }
+
+        if (!formData.address.trim()) errors.address = 'Address is required.';
+        if (!formData.suburb.trim()) errors.suburb = 'Suburb is required.';
+        
+        if (!formData.postcode.trim()) {
+            errors.postcode = 'Postcode is required.';
+        } else if (!/^\d{4}$/.test(formData.postcode.trim())) {
+            errors.postcode = 'Postcode must be exactly 4 digits.';
+        }
+
         if (!formData.gp_name.trim()) errors.gp_name = 'GP name is required.';
+        
         if (!formData.gp_phone.trim()) {
             errors.gp_phone = 'GP phone is required.';
         } else if (!validateAUPhone(formData.gp_phone)) {
             errors.gp_phone = 'Enter a valid Australian phone (e.g. 02 9639 2929 or 0400 123 456).';
         }
-        // Validate patient phone too
-        if (formData.phone && !validateAUPhone(formData.phone)) {
-            errors.phone = 'Enter a valid Australian phone (e.g. 02 9639 2929 or 0400 123 456).';
+
+        if (formData.next_of_kin_phone && !validateAUPhone(formData.next_of_kin_phone)) {
+            errors.next_of_kin_phone = 'Enter a valid Australian phone.';
+        }
+        
+        if (formData.other_specialist_phone && !validateAUPhone(formData.other_specialist_phone)) {
+            errors.other_specialist_phone = 'Enter a valid Australian phone.';
+        }
+
+        if (formData.gp_postcode && !/^\d{4}$/.test(formData.gp_postcode.trim())) {
+            errors.gp_postcode = 'GP Postcode must be exactly 4 digits.';
         }
 
         if (Object.keys(errors).length > 0) {
             setFieldErrors(errors);
-            setError('Please correct the errors highlighted below.');
+            toast.error('Please correct the highlighted errors.');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
         if (!formData.consent_given) {
-            setError('Please provide consent to proceed.');
+            toast.error('Please provide consent to proceed.');
             return;
         }
 
         if (!formData.cancellation_policy_accepted) {
-            setError('Please accept the cancellation policy.');
+            toast.error('Please accept the cancellation policy.');
             return;
         }
 
         setLoading(true);
-        setError('');
 
         try {
-            const response = await patientAPI.register(formData);
+            // Map frontend specific fields to backend expectations
+            // Strip spaces from phone numbers
+            const payload = {
+                ...formData,
+                phone: formData.phone.replace(/\s+/g, ''),
+                gp_phone: formData.gp_phone.replace(/\s+/g, ''),
+                next_of_kin_phone: formData.next_of_kin_phone ? formData.next_of_kin_phone.replace(/\s+/g, '') : '',
+                other_specialist_phone: formData.other_specialist_phone ? formData.other_specialist_phone.replace(/\s+/g, '') : '',
+                legal_process_involved: formData.legal_process,
+            };
+            
+            const response = await patientAPI.register(payload);
+            toast.success('Registration successful!');
             onComplete(response.data);
         } catch (err) {
-            setError('Failed to register. Please check your details and try again.');
+            toast.error(extractErrorMessage(err));
             console.error(err);
         } finally {
             setLoading(false);
@@ -110,8 +181,6 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
             <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>
                 Please complete your registration to continue with the booking.
             </p>
-
-            {error && <div className="error-message">{error}</div>}
 
             <form onSubmit={handleSubmit} className="booking-form">
                 <h3 style={{ marginBottom: '20px', color: 'var(--brand-navy)' }}>
@@ -139,7 +208,9 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                             onChange={handleChange}
                             placeholder="John Smith"
                             required
+                            style={{ borderColor: fieldErrors.full_name ? '#ef4444' : undefined }}
                         />
+                        {fieldErrors.full_name && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.full_name}</p>}
                     </div>
                 </div>
 
@@ -152,6 +223,7 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                             value={formData.phone}
                             onChange={handleChange}
                             placeholder="0400 123 456"
+                            maxLength="14"
                             required
                             style={{ borderColor: fieldErrors.phone ? '#ef4444' : undefined }}
                         />
@@ -170,7 +242,9 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                             onChange={handleChange}
                             placeholder="john@example.com"
                             required
+                            style={{ borderColor: fieldErrors.email ? '#ef4444' : undefined }}
                         />
+                        {fieldErrors.email && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.email}</p>}
                     </div>
                 </div>
 
@@ -221,7 +295,10 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                         value={formData.next_of_kin_phone}
                         onChange={handleChange}
                         placeholder="0400 123 456"
+                        maxLength="14"
+                        style={{ borderColor: fieldErrors.next_of_kin_phone ? '#ef4444' : undefined }}
                     />
+                    {fieldErrors.next_of_kin_phone && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.next_of_kin_phone}</p>}
                 </div>
 
                 <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
@@ -237,7 +314,9 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                         onChange={handleChange}
                         placeholder="123 Main Street"
                         required
+                        style={{ borderColor: fieldErrors.address ? '#ef4444' : undefined }}
                     />
+                    {fieldErrors.address && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.address}</p>}
                 </div>
 
                 <div className="form-row">
@@ -250,7 +329,9 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                             onChange={handleChange}
                             placeholder="Baulkham Hills"
                             required
+                            style={{ borderColor: fieldErrors.suburb ? '#ef4444' : undefined }}
                         />
+                        {fieldErrors.suburb && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.suburb}</p>}
                     </div>
 
                     <div className="form-group">
@@ -278,7 +359,9 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                         placeholder="2153"
                         maxLength="4"
                         required
+                        style={{ borderColor: fieldErrors.postcode ? '#ef4444' : undefined }}
                     />
+                    {fieldErrors.postcode && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.postcode}</p>}
                 </div>
 
                 <h3 style={{ marginTop: '30px', marginBottom: '4px', color: 'var(--brand-navy)' }}>
@@ -356,7 +439,9 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                         onChange={handleChange}
                         placeholder="2153"
                         maxLength="4"
+                        style={{ borderColor: fieldErrors.gp_postcode ? '#ef4444' : undefined }}
                     />
+                    {fieldErrors.gp_postcode && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.gp_postcode}</p>}
                 </div>
 
                 <h3 style={{ marginTop: '30px', marginBottom: '20px', color: 'var(--brand-navy)' }}>
@@ -383,7 +468,10 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                             value={formData.other_specialist_phone}
                             onChange={handleChange}
                             placeholder="(02) 1234 5678"
+                            maxLength="14"
+                            style={{ borderColor: fieldErrors.other_specialist_phone ? '#ef4444' : undefined }}
                         />
+                        {fieldErrors.other_specialist_phone && <p style={{ color: '#dc2626', fontSize: '0.8rem', marginTop: '4px' }}>{fieldErrors.other_specialist_phone}</p>}
                     </div>
                 </div>
 
