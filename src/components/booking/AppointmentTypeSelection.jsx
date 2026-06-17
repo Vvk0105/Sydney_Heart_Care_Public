@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { appointmentTypeAPI } from '../../services/api';
 
-const AppointmentTypeSelection = ({ onSelect, onBack }) => {
+const AppointmentTypeSelection = ({ onSelect, onBack, patient, onEditPatient }) => {
     const [types, setTypes] = useState([]);
     const [selectedType, setSelectedType] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -58,9 +58,21 @@ const AppointmentTypeSelection = ({ onSelect, onBack }) => {
     return (
         <div className="appointment-type-selection">
             <h2>Select Appointment Type</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>
-                Choose the type of consultation you need.
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+                <p style={{ color: 'var(--text-muted)', margin: 0 }}>
+                    Choose the type of consultation you need.
+                </p>
+                {patient && onEditPatient && (
+                    <button 
+                        type="button" 
+                        className="btn btn-outline" 
+                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                        onClick={onEditPatient}
+                    >
+                        Edit Patient Details
+                    </button>
+                )}
+            </div>
 
             <div className="appointment-types-grid">
                 {types.map((type) => (

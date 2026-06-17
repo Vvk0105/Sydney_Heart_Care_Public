@@ -110,6 +110,8 @@ const TestBookingPage = () => {
                 return (
                     <PatientRegistration
                         medicareData={state.patient}
+                        isEditing={state.patientExists}
+                        patientId={state.patient?.patient_id || state.patient?.id}
                         onComplete={handleRegistrationComplete}
                         onBack={() => updateState({ currentStep: STEPS.PATIENT_LOOKUP })}
                     />
@@ -117,6 +119,8 @@ const TestBookingPage = () => {
             case STEPS.TEST_TYPE:
                 return (
                     <TestTypeSelection
+                        patient={state.patient}
+                        onEditPatient={() => updateState({ currentStep: STEPS.PATIENT_REGISTRATION })}
                         onSelect={handleTestTypeSelected}
                         onBack={() => updateState({ currentStep: STEPS.PATIENT_LOOKUP })}
                     />

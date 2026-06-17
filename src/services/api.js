@@ -21,10 +21,10 @@ api.interceptors.response.use(
     }
 );
 
-// Patient API
 export const patientAPI = {
     lookup: (data) => api.post('/patients/lookup/', data),
     register: (data) => api.post('/patients/register/', data),
+    update: (id, data) => api.put(`/patients/${id}/`, data),
 };
 
 // Appointment Type API

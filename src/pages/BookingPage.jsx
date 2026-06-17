@@ -124,6 +124,8 @@ const BookingPage = () => {
                 return (
                     <PatientRegistration
                         medicareData={state.patient}
+                        isEditing={state.patientExists}
+                        patientId={state.patient?.patient_id || state.patient?.id}
                         onComplete={handleRegistrationComplete}
                         onBack={() => updateState({ currentStep: STEPS.PATIENT_LOOKUP })}
                     />
@@ -131,6 +133,8 @@ const BookingPage = () => {
             case STEPS.APPOINTMENT_TYPE:
                 return (
                     <AppointmentTypeSelection
+                        patient={state.patient}
+                        onEditPatient={() => updateState({ currentStep: STEPS.PATIENT_REGISTRATION })}
                         onSelect={handleAppointmentTypeSelected}
                         onBack={() => updateState({ currentStep: STEPS.PATIENT_LOOKUP })}
                     />

@@ -26,9 +26,8 @@ const formatAUPhone = (value) => {
     return digits;
 };
 
-const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
+const PatientRegistration = ({ medicareData, onComplete, onBack, isEditing = false, patientId = null }) => {
     const [formData, setFormData] = useState({
-        ...medicareData,
         title: 'Mr',
         full_name: '',
         phone: '',
@@ -59,6 +58,7 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
         legal_process: false,
         consent_given: false,
         cancellation_policy_accepted: false,
+        ...medicareData,
     });
     const [loading, setLoading] = useState(false);
     const [fieldErrors, setFieldErrors] = useState({});
@@ -164,8 +164,14 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                 legal_process_involved: formData.legal_process,
             };
             
-            const response = await patientAPI.register(payload);
-            toast.success('Registration successful!');
+            let response;
+            if (isEditing && patientId) {
+                response = await patientAPI.update(patientId, payload);
+                toast.success('Patient details updated successfully!');
+            } else {
+                response = await patientAPI.register(payload);
+                toast.success('Registration successful!');
+            }
             onComplete(response.data);
         } catch (err) {
             toast.error(extractErrorMessage(err));
@@ -177,9 +183,11 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
 
     return (
         <div className="patient-registration">
-            <h2>Patient Registration</h2>
+            <h2>{isEditing ? 'Update Patient Details' : 'Patient Registration'}</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '30px' }}>
-                Please complete your registration to continue with the booking.
+                {isEditing 
+                    ? 'Please review and update your details to continue with the booking.' 
+                    : 'Please complete your registration to continue with the booking.'}
             </p>
 
             <form onSubmit={handleSubmit} className="booking-form">
@@ -640,7 +648,7 @@ const PatientRegistration = ({ medicareData, onComplete, onBack }) => {
                         Back
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={loading}>
-                        {loading ? 'Registering...' : 'Continue'}
+                        {loading ? 'Saving...' : (isEditing ? 'Save & Continue' : 'Register')}
                     </button>
                 </div>
             </form>
