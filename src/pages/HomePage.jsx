@@ -4,6 +4,10 @@ import { Link } from 'react-router-dom';
 
 const HomePage = () => {
     useEffect(() => {
+        // Clear any booking form states when returning to home
+        localStorage.removeItem('bookingState');
+        localStorage.removeItem('testBookingState');
+
         const animatedElements = document.querySelectorAll('.fade-in');
         const observer = new IntersectionObserver(
             (entries) => {
