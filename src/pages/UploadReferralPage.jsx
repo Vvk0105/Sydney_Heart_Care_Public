@@ -24,7 +24,18 @@ const UploadReferralPage = () => {
     };
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        if (!selectedFile) return;
+
+        if (selectedFile.size > 5 * 1024 * 1024) {
+            setError('File exceeds the 5MB size limit. Please choose a smaller file.');
+            e.target.value = '';
+            setFile(null);
+            return;
+        }
+
+        setError('');
+        setFile(selectedFile);
     };
 
     const handleSubmit = async (e) => {
@@ -191,7 +202,7 @@ const UploadReferralPage = () => {
                             </h3>
 
                             <div className="form-group">
-                                <label className="required">Referral Letter (PDF, JPG, PNG)</label>
+                                <label className="required">Referral Letter (PDF, JPG, PNG) - Max 5MB</label>
                                 <input
                                     type="file"
                                     onChange={handleFileChange}

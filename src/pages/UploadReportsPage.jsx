@@ -12,6 +12,7 @@ const UploadReportsPage = () => {
     });
     const [files, setFiles] = useState([]);
     const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -19,7 +20,19 @@ const UploadReportsPage = () => {
     };
 
     const handleFileChange = (e) => {
-        setFiles(Array.from(e.target.files));
+        const selectedFiles = Array.from(e.target.files);
+        const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+        const oversizedFiles = selectedFiles.filter(f => f.size > MAX_SIZE);
+        if (oversizedFiles.length > 0) {
+            setError('One or more files exceed the 5MB size limit. Please choose smaller files.');
+            e.target.value = ''; // clear input
+            setFiles([]);
+            return;
+        }
+
+        setError('');
+        setFiles(selectedFiles);
     };
 
     const handleSubmit = (e) => {
@@ -69,6 +82,12 @@ const UploadReportsPage = () => {
                     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
 
                         <form onSubmit={handleSubmit} className="booking-form">
+
+                            {error && (
+                                <div style={{ padding: '12px 16px', background: '#fee2e2', borderRadius: '8px', color: '#991b1b', marginBottom: '20px', borderLeft: '4px solid #ef4444' }}>
+                                    {error}
+                                </div>
+                            )}
 
                             <h3 style={{ marginBottom: '20px', color: 'var(--brand-navy)' }}>
                                 Patient Information
@@ -160,7 +179,7 @@ const UploadReportsPage = () => {
                             </div>
 
                             <div className="form-group">
-                                <label className="required">Upload Files (PDF, JPG, PNG)</label>
+                                <label className="required">Upload Files (PDF, JPG, PNG) - Max 5MB per file</label>
                                 <input
                                     type="file"
                                     onChange={handleFileChange}
