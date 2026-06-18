@@ -93,6 +93,7 @@ h6 {
     text-decoration: none;
     transition: var(--transition);
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .btn-primary {
@@ -308,6 +309,14 @@ h6 {
 .hero-actions {
     display: flex;
     gap: 15px;
+    align-items: center;
+}
+
+.hero-actions .btn {
+    flex: 1;
+    max-width: 240px;
+    text-align: center;
+    justify-content: center;
 }
 
 .hero-visual {
@@ -616,6 +625,12 @@ section {
     margin-bottom: 30px;
 }
 
+.cta-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 /* ========================================
    Footer
    ======================================== */
@@ -788,6 +803,12 @@ section {
 
     .hero-actions {
         flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-actions .btn {
+        max-width: none;
+        width: 100%;
     }
 
     .contact-cta-card {

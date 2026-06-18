@@ -43,7 +43,7 @@ const HomePage = () => {
                         </p>
                         <div className="hero-actions">
                             <Link to="/book" className="btn btn-primary">Book an Appointment</Link>
-                            <a href="#about" className="btn btn-outline" onClick={(e) => scrollToSection(e, '#about')}>Meet The Doctor</a>
+                            <Link to="/book-test" className="btn btn-outline">Book a Test</Link>
                         </div>
                     </div>
                     <div className="hero-visual fade-in delay-1">
@@ -162,9 +162,12 @@ const HomePage = () => {
                     </div>
 
                     <div className="contact-cta-card fade-in delay-1">
-                        <h4>Book Your Appointment</h4>
+                        <h4>Book an Appointment or Test</h4>
                         <p>Use our online booking system for quick and convenient scheduling.</p>
-                        <Link to="/book" className="btn btn-primary btn-block">Book Appointment Online</Link>
+                        <div className="cta-actions">
+                            <Link to="/book" className="btn btn-primary btn-block">Book an Appointment</Link>
+                            <Link to="/book-test" className="btn btn-outline btn-block">Book a Test</Link>
+                        </div>
                     </div>
                 </div>
             </section>
