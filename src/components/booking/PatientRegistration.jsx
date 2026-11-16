@@ -170,7 +170,14 @@ const PatientRegistration = ({ medicareData, onComplete, onBack, isEditing = fal
             
             let response;
             if (isEditing && patientId) {
-                response = await patientAPI.update(patientId, payload);
+                // Proof of identity: the same Medicare details the patient typed
+                // on the lookup step. The server checks they match this patient.
+                response = await patientAPI.update(patientId, {
+                    ...payload,
+                    verify_medicare_number: medicareData?.medicare_number,
+                    verify_medicare_irn: medicareData?.medicare_irn,
+                    verify_date_of_birth: medicareData?.date_of_birth,
+                });
                 toast.success('Patient details updated successfully!');
             } else {
                 response = await patientAPI.register(payload);
