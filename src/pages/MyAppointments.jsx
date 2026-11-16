@@ -47,7 +47,7 @@ const MyAppointments = () => {
         }
 
         try {
-            await appointmentAPI.cancel(appointmentId, 'Cancelled by patient');
+            await appointmentAPI.cancel(appointmentId, 'Cancelled by patient', formData);
             alert('Appointment cancelled successfully');
             // Refresh the list
             handleSubmit(new Event('submit'));

@@ -52,7 +52,13 @@ export const appointmentAPI = {
     },
     availableSlots: (data) => api.post('/appointments/available_slots/', data),
     myAppointments: (data) => api.post('/appointments/my_appointments/', data),
-    cancel: (id, reason) => api.post(`/appointments/${id}/cancel/`, { reason }),
+    // `verify` = the Medicare details the patient typed (proof they own this booking)
+    cancel: (id, reason, verify = {}) => api.post(`/appointments/${id}/cancel/`, {
+        reason,
+        verify_medicare_number: verify.medicare_number,
+        verify_medicare_irn: verify.medicare_irn,
+        verify_date_of_birth: verify.date_of_birth,
+    }),
     nextAvailableDate: (appointmentTypeId) =>
         api.get(`/appointments/next_available_date/?appointment_type_id=${appointmentTypeId}`),
 };
@@ -72,7 +78,12 @@ export const testAPI = {
     },
     availableSlots: (data) => api.post('/tests/available_slots/', data),
     myTests: (data) => api.post('/tests/my_tests/', data),
-    cancel: (id, reason) => api.post(`/tests/${id}/cancel/`, { reason }),
+    cancel: (id, reason, verify = {}) => api.post(`/tests/${id}/cancel/`, {
+        reason,
+        verify_medicare_number: verify.medicare_number,
+        verify_medicare_irn: verify.medicare_irn,
+        verify_date_of_birth: verify.date_of_birth,
+    }),
     nextAvailableDate: (testTypeId) =>
         api.get(`/tests/next_available_date/?test_type_id=${testTypeId}`),
 };
