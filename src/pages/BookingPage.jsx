@@ -5,6 +5,7 @@ import PatientRegistration from '../components/booking/PatientRegistration';
 import AppointmentTypeSelection from '../components/booking/AppointmentTypeSelection';
 import SlotSelection from '../components/booking/SlotSelection';
 import BookingConfirmation from '../components/booking/BookingConfirmation';
+import ClosureNotice from '../components/ClosureNotice';
 import './BookingPage.css';
 
 const STEPS = {
@@ -198,6 +199,7 @@ const BookingPage = () => {
 
             <div className="booking-container">
                 <div className="container">
+                    <ClosureNotice variant="card" />
                     {state.currentStep !== STEPS.PATIENT_LOOKUP &&
                         state.currentStep !== STEPS.PATIENT_REGISTRATION &&
                         getStepIndicator()}

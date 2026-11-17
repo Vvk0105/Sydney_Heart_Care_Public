@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import Header from '../components/Header';
+import ClosureNotice from '../components/ClosureNotice';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
@@ -54,6 +55,13 @@ const HomePage = () => {
                             <a href="tel:0296392929" className="phone-link">02 9639 2929</a>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* Clinic closure notice (hides itself after the closure ends) */}
+            <section className="closure-section">
+                <div className="container">
+                    <ClosureNotice variant="card" />
                 </div>
             </section>
 

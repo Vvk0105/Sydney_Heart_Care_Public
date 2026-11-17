@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import ClosureNotice from './ClosureNotice';
 
 const Header = ({ currentPage = '' }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -21,6 +22,9 @@ const Header = ({ currentPage = '' }) => {
 
     return (
         <>
+            {/* Clinic closure notice (hides itself after the closure ends) */}
+            <ClosureNotice variant="banner" />
+
             {/* Top Bar */}
             <div className="top-bar">
                 <div className="container top-bar-inner">
