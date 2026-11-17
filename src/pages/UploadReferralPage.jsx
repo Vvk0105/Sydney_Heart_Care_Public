@@ -34,8 +34,16 @@ const UploadReferralPage = () => {
         try {
             const data = new FormData();
             data.append('referral_type', 'patient');
+            // The form's field names differ from the server's. Without this
+            // mapping the server silently dropped the patient's Medicare number,
+            // date of birth and phone number.
+            const serverNames = {
+                medicare_number: 'patient_medicare',
+                dob: 'patient_dob',
+                phone: 'patient_phone',
+            };
             Object.entries(formData).forEach(([key, value]) => {
-                if (value) data.append(key, value);
+                if (value) data.append(serverNames[key] || key, value);
             });
             if (file) {
                 data.append('referral_file', file);

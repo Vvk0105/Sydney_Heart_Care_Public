@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
 import PageLayout from '../components/PageLayout';
+import { referralAPI, extractErrorMessage } from '../services/api';
+
+const REPORT_TYPES = {
+    'blood-test': 'Blood Test Results',
+    ecg: 'ECG/EKG Results',
+    echo: 'Echocardiogram',
+    'stress-test': 'Stress Test',
+    holter: 'Holter Monitor Results',
+    'bp-monitor': 'BP Monitor Results',
+    angiogram: 'Angiogram/Angiography',
+    other: 'Other Medical Report',
+};
+const MAX_FILES = 10;
+const MAX_FILE_MB = 10;
 
 const UploadReportsPage = () => {
     const [formData, setFormData] = useState({
@@ -12,6 +26,8 @@ const UploadReportsPage = () => {
     });
     const [files, setFiles] = useState([]);
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -20,13 +36,58 @@ const UploadReportsPage = () => {
 
     const handleFileChange = (e) => {
         setFiles(Array.from(e.target.files));
+        setError('');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // TODO: Backend integration - upload files
-        console.log('Reports uploaded:', formData, files);
-        setSubmitted(true);
+        setError('');
+
+        if (files.length === 0) {
+            setError('Please choose at least one file to upload.');
+            return;
+        }
+        if (files.length > MAX_FILES) {
+            setError(`Please upload at most ${MAX_FILES} files at a time.`);
+            return;
+        }
+        const tooBig = files.find((f) => f.size > MAX_FILE_MB * 1024 * 1024);
+        if (tooBig) {
+            setError(`"${tooBig.name}" is larger than ${MAX_FILE_MB} MB. Please choose a smaller file.`);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const data = new FormData();
+            data.append('referral_type', 'reports');
+            data.append('patient_name', formData.patient_name);
+            data.append('patient_medicare', formData.medicare_number);
+            data.append('patient_dob', formData.dob);
+            data.append('patient_phone', formData.phone);
+            data.append(
+                'reason_for_referral',
+                `Medical reports: ${REPORT_TYPES[formData.report_type] || formData.report_type}`
+            );
+            if (formData.notes.trim()) data.append('clinical_notes', formData.notes.trim());
+            // First file travels as the main document, the rest as extra files
+            data.append('referral_file', files[0]);
+            files.slice(1).forEach((f) => data.append('extra_files', f));
+
+            await referralAPI.submit(data);
+            setSubmitted(true);
+        } catch (err) {
+            console.error('Report upload error:', err);
+            if (err.response?.status === 429) {
+                setError('Too many attempts. Please wait a few minutes and try again.');
+            } else if (err.response?.status === 400) {
+                setError(extractErrorMessage(err));
+            } else {
+                setError('Your reports could not be uploaded. Please try again, or contact the clinic on 02 9639 2929.');
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -160,7 +221,7 @@ const UploadReportsPage = () => {
                             </div>
 
                             <div className="form-group">
-                                <label className="required">Upload Files (PDF, JPG, PNG)</label>
+                                <label className="required">Upload Files (PDF, JPG, PNG. Up to 10 files, 10 MB each)</label>
                                 <input
                                     type="file"
                                     onChange={handleFileChange}
@@ -202,9 +263,26 @@ const UploadReportsPage = () => {
                                 </p>
                             </div>
 
+                            {error && (
+                                <div
+                                    role="alert"
+                                    style={{
+                                        marginTop: '20px',
+                                        padding: '14px 18px',
+                                        background: '#fef2f2',
+                                        border: '1px solid #fecaca',
+                                        borderRadius: 'var(--radius-md)',
+                                        color: '#991b1b',
+                                        whiteSpace: 'pre-line',
+                                    }}
+                                >
+                                    {error}
+                                </div>
+                            )}
+
                             <div style={{ marginTop: '30px' }}>
-                                <button type="submit" className="btn btn-primary">
-                                    Upload Reports
+                                <button type="submit" className="btn btn-primary" disabled={loading}>
+                                    {loading ? 'Uploading...' : 'Upload Reports'}
                                 </button>
                             </div>
                         </form>
